@@ -1,5 +1,11 @@
 # @framekore/math
 
+## 0.0.5
+
+### Patch Changes
+
+- 81f241a: dependences iife
+
 ## 0.0.4
 
 ### Patch Changes

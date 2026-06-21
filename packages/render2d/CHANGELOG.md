@@ -1,5 +1,15 @@
 # @framekore/render2d
 
+## 0.0.5
+
+### Patch Changes
+
+- 81f241a: dependences iife
+- Updated dependencies [81f241a]
+  - @framekore/core@0.0.5
+  - @framekore/math@0.0.5
+  - @framekore/transform2d@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes
