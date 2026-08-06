@@ -1,5 +1,11 @@
 # @framekore/core
 
+## 1.0.0
+
+### Major Changes
+
+- d690f3c: documentation
+
 ## 0.0.5
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @framekore/asset-manager
 
+## 1.0.0
+
+### Major Changes
+
+- d690f3c: documentation
+
+### Patch Changes
+
+- Updated dependencies [d690f3c]
+  - @framekore/core@1.0.0
+
 ## 0.0.5
 
 ### Patch Changes
