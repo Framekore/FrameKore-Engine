@@ -11,6 +11,13 @@ type TransformLike = Component & ITransform2D
 const rigidBodies = new WeakMap<Engine, Set<RigidBody2D>>();
 const boxColliders = new WeakMap<Engine, Set<BoxCollide2D>>();
 
+/**
+ * Creates the Physics2D plugin for the Engine.
+ * Registers PhysicsManager2D and handles fixed step updates for physics resolution.
+ * @returns An EnginePlugin definition to be passed to `engine.use()`.
+ * @example
+ * engine.use(physics2d());
+ */
 export const physics2d = definePlugin(() => {
   return {
     name: "physics",
@@ -51,23 +58,36 @@ export const physics2d = definePlugin(() => {
   };
 });
 
-
+/**
+ * Manages physics simulation, collision detection, and resolution.
+ * Accessed globally through the Engine resources.
+ */
 export class Physics2D {
+  /** 
+   * Global gravity vector applied to all RigidBody2D components that have `useGravity` enabled.
+   */
   gravity: Vector2 = new Vector2(0, 1500);
 
   #engine: Engine;
 
+  /**
+   * @internal Instantiated automatically by the physics2d plugin.
+   */
   constructor(engine: Engine) {
     this.#engine = engine;
   }
 
   /**
-   * Verifica se dois GameObjects estão colidindo
+   * Checks if two GameObjects are physically overlapping (AABB collision).
+   * Both objects must have a Transform2D and BoxCollide2D component.
+   * @param a - The first GameObject.
+   * @param b - The second GameObject.
+   * @returns True if the colliders overlap, otherwise false.
    * @example
-   *```ts
-   *if (Physics.checkCollision(Player, Enemy))
-   *
-   *```
+   * const physics = engine.getResource(Physics2D);
+   * if (physics.checkCollision(player, bullet)) {
+   *   console.log("Player hit!");
+   * }
    */
   checkCollision(a: GameObject, b: GameObject): boolean {
     const transformA = a.getComponent<TransformLike>(TRANSFORM_2D);
@@ -77,7 +97,7 @@ export class Physics2D {
 
     if (!boxA || !boxB || !transformA || !transformB)
       throw new Error(
-        "Os objetos precisam ter os components 'Transform2D' e 'BoxCollide2D'",
+        "Objects must have 'Transform2D' and 'BoxCollide2D' components to check collisions.",
       );
 
     const boundA = boxA.getBounds(transformA);
@@ -92,7 +112,10 @@ export class Physics2D {
   }
 
   /**
-   * Verifica se dois colliders podem interagir com base em layer e mask.
+   * Determines whether two colliders are allowed to interact based on their layer and mask configuration.
+   * @param boxA - The first BoxCollide2D.
+   * @param boxB - The second BoxCollide2D.
+   * @returns True if they can collide, false otherwise.
    */
   canCollide(boxA: BoxCollide2D, boxB: BoxCollide2D): boolean {
     const aHitsB = (boxA.mask & boxB.layer) !== 0
@@ -102,11 +125,12 @@ export class Physics2D {
   }
 
   /**
-   * Resolve a colisão física entre dois GameObjects
-   * @param object1 GameObject
-   * @param object2 GameObject
+   * Manually resolves a collision between two GameObjects by separating them.
+   * Updates velocities and touching state if RigidBody2D components are present.
+   * @param object1 - The first GameObject.
+   * @param object2 - The second GameObject.
    */
-  resolveCollision(object1: GameObject, object2: GameObject) {
+  resolveCollision(object1: GameObject, object2: GameObject): void {
     const transformA = object1.getComponent<TransformLike>(TRANSFORM_2D);
     const boxA = object1.getComponent<BoxCollide2D>(BOX_COLLIDE_2D);
     const transformB = object2.getComponent<TransformLike>(TRANSFORM_2D);
@@ -114,7 +138,7 @@ export class Physics2D {
 
     if (!boxA || !boxB || !transformA || !transformB)
       throw new Error(
-        "Os objetos precisam ter os components 'Transform2D' e 'BoxCollide2D'",
+        "Objects must have 'Transform2D' and 'BoxCollide2D' components to resolve collisions.",
       );
 
     const dx =
@@ -222,10 +246,13 @@ export class Physics2D {
       }
     }
   }
+
   /**
-   * Atualiza a física dos corpos e resolve colisões separando por eixo.
+   * Updates physics states, applies gravity, moves objects, and resolves collisions using a separated-axis approach.
+   * Called automatically by the engine's fixed update loop.
+   * @param delta - The fixed time step.
    */
-  step(delta: number) {
+  step(delta: number): void {
     const rbSet = rigidBodies.get(this.#engine);
     const colSet = boxColliders.get(this.#engine);
     if (!rbSet || !colSet) return;
@@ -254,10 +281,13 @@ export class Physics2D {
       this.resolveCollisionsY(rb, colSet)
     }
   }
+
   /**
-   * Resolve colisões no eixo X para um rigid body.
+   * Resolves horizontal (X-axis) collisions for a specific rigid body against all other colliders.
+   * @param rb - The moving RigidBody2D.
+   * @param colSet - Set of all active BoxCollide2D components.
    */
-  resolveCollisionsX(rb: RigidBody2D, colSet: Set<BoxCollide2D>) {
+  resolveCollisionsX(rb: RigidBody2D, colSet: Set<BoxCollide2D>): void {
     const objA = rb.gameObject
     if (!objA)
       return
@@ -301,9 +331,11 @@ export class Physics2D {
   }
 
   /**
-   * Resolve colisões no eixo Y para um rigid body.
+   * Resolves vertical (Y-axis) collisions for a specific rigid body against all other colliders.
+   * @param rb - The moving RigidBody2D.
+   * @param colSet - Set of all active BoxCollide2D components.
    */
-  resolveCollisionsY(rb: RigidBody2D, colSet: Set<BoxCollide2D>) {
+  resolveCollisionsY(rb: RigidBody2D, colSet: Set<BoxCollide2D>): void {
     const objA = rb.gameObject
     if (!objA) return
 

@@ -1,5 +1,12 @@
 import { definePlugin, type Engine } from "@framekore/core";
 
+/**
+ * Creates an Input plugin for the Engine.
+ * Registers the InputManager to handle keyboard events globally.
+ * @returns An EnginePlugin definition to be passed to `engine.use()`.
+ * @example
+ * engine.use(inputPlugin());
+ */
 export const inputPlugin = definePlugin(()=>{
     return {
         name: "input",
@@ -14,17 +21,33 @@ export const inputPlugin = definePlugin(()=>{
     }
 })
 
+/**
+ * Manages global keyboard input state.
+ * Listens to `keydown` and `keyup` events on the window object.
+ */
 export class InputManager {
     #keys = new Set<string>();
     
+    /**
+     * @internal Created automatically by the `inputPlugin`.
+     */
     constructor() {
         window.addEventListener("keydown", this.#onKeyDown)
         window.addEventListener("keyup", this.#onKeyUp)
     }
 
+    /**
+     * Retrieves the active InputManager instance from an Engine.
+     * @param engine - The Engine instance.
+     * @returns The InputManager instance.
+     * @throws If the InputManager has not been added to the Engine via `inputPlugin`.
+     * @example
+     * const input = InputManager.get(engine);
+     * if (input.isDown("ArrowUp")) { ... }
+     */
     static get(engine: Engine): InputManager{
         const input = engine.getResource(InputManager)
-        if (!input) throw new Error("InputPlugin não foi adicionado a Engine")
+        if (!input) throw new Error("InputPlugin has not been added to the Engine.")
         return input
     }
 
@@ -36,11 +59,24 @@ export class InputManager {
         this.#keys.delete(e.code)
     }
 
-    isDown(code: string) {
+    /**
+     * Checks if a specific key is currently being pressed down.
+     * @param code - The KeyboardEvent.code string (e.g., "KeyW", "ArrowUp", "Space").
+     * @returns True if the key is pressed, false otherwise.
+     * @example
+     * if (input.isDown("Space")) {
+     *   player.jump();
+     * }
+     */
+    isDown(code: string): boolean {
         return this.#keys.has(code)
     }
 
-    destroy() {
+    /**
+     * Cleans up event listeners and clears the tracked keys.
+     * Automatically called when the plugin is destroyed.
+     */
+    destroy(): void {
         window.removeEventListener("keydown", this.#onKeyDown)
         window.removeEventListener("keyup", this.#onKeyUp)
         this.#keys.clear()

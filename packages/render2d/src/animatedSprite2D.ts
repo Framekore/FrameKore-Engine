@@ -2,39 +2,54 @@ import { Sprite2D } from "./sprite2D";
 import type { Frame } from "./texture";
 
 /**
- * Componente para renderização de sprites animados a partir de uma spritesheet.
- * Estende a funcionalidade do Sprite2D para gerenciar trocas de frames por tempo.
+ * Component for rendering animated sprites from a spritesheet.
+ * Extends Sprite2D to manage time-based frame swapping.
  */
 export class AnimatedSprite2D extends Sprite2D {
-    /** @internal Lista de frames que compõem a animação atual. */
+    /** @internal List of frames making up the current animation sequence. */
     #frames: Frame[] = [];
-    /** @internal Índice do frame sendo exibido no momento. */
+    /** @internal Index of the currently displayed frame in the sequence. */
     #currentFrame = 0;
-    /** @internal Acumulador de tempo desde a última troca de frame. */
+    /** @internal Accumulated time since the last frame swap. */
     #elapsed = 0;
 
-    /** Velocidade da animação em Frames Por Segundo. */
+    /** 
+     * Animation playback speed in Frames Per Second. 
+     * Default is 10.
+     * @example
+     * animatedSprite.fps = 24; // Smooth animation
+     */
     fps = 10;
-    /** Define se a animação deve ser processada no loop. */
+
+    /** 
+     * Determines whether the animation is currently progressing.
+     * If false, the animation stays on the current frame.
+     */
     playing = true;
 
     /**
-     * Adiciona um novo frame à lista de animação com base em coordenadas da textura.
-     * @param x Posição X (em pixels ou índice) do frame na textura.
-     * @param y Posição Y (em pixels ou índice) do frame na textura.
+     * Appends a new frame to the animation sequence based on texture grid coordinates.
+     * The texture must have been previously sliced into a grid.
+     * @param x - The column index (0-based) on the texture grid.
+     * @param y - The row index (0-based) on the texture grid.
+     * @example
+     * animatedSprite.addFrame(0, 0);
+     * animatedSprite.addFrame(1, 0);
+     * animatedSprite.addFrame(2, 0);
      */
     addFrame(x: number, y: number): void {
         const frame = this.texture.getFrame(x, y);
         if (frame) {
             this.#frames.push(frame);
-            // Define o primeiro frame adicionado como o frame visual atual
+            // Set the first added frame as the current visual frame
             if (this.#frames.length === 1) this.frame = frame;
         }
     }
 
     /**
-     * Atualiza o estado da animação com base no tempo decorrido.
-     * @param delta Tempo decorrido desde o último frame (em segundos).
+     * Updates the animation state based on elapsed time.
+     * Typically called internally by the engine's update loop or by a custom component.
+     * @param delta - Time elapsed since the last frame update (in seconds).
      */
     update(delta: number): void {
         if (!this.playing || this.#frames.length === 0) return;
@@ -42,7 +57,7 @@ export class AnimatedSprite2D extends Sprite2D {
         this.#elapsed += delta;
         const frameDuration = 1 / this.fps;
 
-        // Loop para lidar com casos onde o delta é maior que a duração do frame (catch-up)
+        // Loop to handle cases where delta is larger than frame duration (catch-up)
         while (this.#elapsed >= frameDuration) {
             this.#elapsed -= frameDuration;
             this.#currentFrame = (this.#currentFrame + 1) % this.#frames.length;
@@ -51,22 +66,28 @@ export class AnimatedSprite2D extends Sprite2D {
     }
 
     /**
-     * Inicia ou retoma a reprodução da animação.
+     * Starts or resumes the animation playback.
+     * @example animatedSprite.play();
      */
     play(): void {
         this.playing = true;
     }
 
     /**
-     * Pausa a reprodução da animação no frame atual.
+     * Pauses the animation on its current frame.
+     * @example animatedSprite.stop();
      */
     stop(): void {
         this.playing = false;
     }
 
     /**
-     * Define manualmente o frame atual da animação.
-     * @param index O índice do frame na lista interna.
+     * Manually forces the animation to display a specific frame from its internal sequence list.
+     * Resets the elapsed time timer to ensure full frame duration.
+     * @param index - The index of the frame within the `#frames` array (not the texture grid).
+     * @example
+     * // Jump to the third frame added to the animation sequence
+     * animatedSprite.setFrame(2);
      */
     setFrame(index: number): void {
         if (index >= 0 && index < this.#frames.length) {

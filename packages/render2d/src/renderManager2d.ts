@@ -9,6 +9,15 @@ type TransformLike = Component & ITransform2D
 
 const sprites = new WeakMap<Engine, Set<Sprite2D>>()
 
+/**
+ * Creates a Render2D plugin for the Engine.
+ * Must be initialized with a target HTMLCanvasElement.
+ * @param canvas - The HTMLCanvasElement where the engine will draw.
+ * @returns An EnginePlugin definition to be passed to `engine.use()`.
+ * @example
+ * const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
+ * engine.use(render2d(canvas));
+ */
 export const render2d = definePlugin((canvas: HTMLCanvasElement) => {
     let renderDisposer: TickerDisposer | undefined
     return {
@@ -48,34 +57,71 @@ export const render2d = definePlugin((canvas: HTMLCanvasElement) => {
 
 
 
+/**
+ * Manages all 2D rendering operations on the canvas.
+ * Handles the drawing queue, camera transformations, and rendering of Sprite2D components.
+ * This class is automatically instantiated and registered as a resource by the `render2d` plugin.
+ */
 export class RenderManager2D {
+    /** The HTMLCanvasElement being drawn to. */
     canvas: HTMLCanvasElement
+    /** The 2D rendering context of the canvas. */
     ctx: CanvasRenderingContext2D
     #drawQueue: Array<(ctx: CanvasRenderingContext2D) => void> = []
     #screenDrawQueue: Array<(ctx: CanvasRenderingContext2D) => void> = []
     #antialiasing: boolean = false
+
+    /**
+     * @internal Created automatically by the plugin.
+     * @param canvas The target canvas element.
+     */
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas
         const ctx = canvas.getContext("2d")
         if (!ctx) {
-            throw new Error("Canvas2d não disponivel.")
+            throw new Error("Canvas2d context not available.")
         }
         this.ctx = ctx
         ctx.imageSmoothingEnabled = this.antialiasing
     }
 
+    /** 
+     * Enables or disables antialiasing (image smoothing). 
+     * Set to false for pixel art games.
+     */
     set antialiasing(value: boolean) {
+        this.#antialiasing = value
         this.ctx.imageSmoothingEnabled = value
     }
 
+    /** Gets the current antialiasing state. */
+    get antialiasing(): boolean {
+        return this.#antialiasing;
+    }
+
+    /**
+     * Retrieves the active RenderManager2D instance from an Engine.
+     * @param engine - The Engine instance.
+     * @returns The RenderManager2D instance.
+     * @throws If the render manager is not registered in the engine.
+     */
     static get(engine: Engine): RenderManager2D {
         const render = engine.getResource(RenderManager2D)
         if (!render)
-            throw new Error("RenderManager2D não foi adicionado à Engine")
+            throw new Error("RenderManager2D has not been added to the Engine.")
         return render
     }
 
-    getCanvasImage(x: number, y: number, w: number, h: number) {
+    /**
+     * Creates a new Texture from a specific region of the current canvas.
+     * Useful for capturing screenshots or dynamic textures.
+     * @param x - Start X coordinate.
+     * @param y - Start Y coordinate.
+     * @param w - Width of the region.
+     * @param h - Height of the region.
+     * @returns A new Texture object.
+     */
+    getCanvasImage(x: number, y: number, w: number, h: number): Texture {
         const newCanvas = document.createElement('canvas')
         newCanvas.width = w
         newCanvas.height = h
@@ -86,6 +132,11 @@ export class RenderManager2D {
         return new Texture(newCanvas)
     }
 
+    /**
+     * Retrieves the active RenderManager2D from a Scene's engine.
+     * @param scene - The Scene instance.
+     * @returns The RenderManager2D instance.
+     */
     static getFromScene(scene: Scene): RenderManager2D {
         return this.get(scene.engine);
     }
@@ -106,6 +157,7 @@ export class RenderManager2D {
 
         return null
     }
+
     #applyCamera(camera: Camera2D, transform: TransformLike) {
         this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2)
         this.ctx.scale(camera.zoom, camera.zoom)
@@ -199,15 +251,37 @@ export class RenderManager2D {
         }
     }
 
-    createTexture(image: HTMLImageElement | HTMLCanvasElement) {
+    /**
+     * Helper to create a new Texture from an image or canvas.
+     * @param image - The source element.
+     * @returns A new Texture instance.
+     */
+    createTexture(image: HTMLImageElement | HTMLCanvasElement): Texture {
         return new Texture(image)
     }
 
-    draw(callback: (ctx: CanvasRenderingContext2D) => void) {
+    /**
+     * Enqueues a custom drawing operation to be executed in the world space (affected by camera).
+     * @param callback - A function that receives the 2D context to perform custom drawing.
+     * @example
+     * renderManager.draw((ctx) => {
+     *   ctx.fillStyle = "red";
+     *   ctx.fillRect(0, 0, 100, 100);
+     * });
+     */
+    draw(callback: (ctx: CanvasRenderingContext2D) => void): void {
         this.#drawQueue.push(callback)
     }
 
-    drawScreen(callback: (ctx: CanvasRenderingContext2D) => void) {
+    /**
+     * Enqueues a custom drawing operation to be executed in screen space (unaffected by camera, e.g., UI).
+     * @param callback - A function that receives the 2D context.
+     * @example
+     * renderManager.drawScreen((ctx) => {
+     *   ctx.fillText("Score: 100", 10, 20);
+     * });
+     */
+    drawScreen(callback: (ctx: CanvasRenderingContext2D) => void): void {
         this.#screenDrawQueue.push(callback)
     }
 
@@ -251,7 +325,12 @@ export class RenderManager2D {
         this.#renderSprite(transform, sprite)
     }
 
-    render(scene?: Scene, delta: number = 1 / 60) {
+    /**
+     * @internal Called automatically by the engine to render the scene.
+     * @param scene - The current scene.
+     * @param delta - Time delta.
+     */
+    render(scene?: Scene, delta: number = 1 / 60): void {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
         if (!scene) return
 

@@ -1,23 +1,39 @@
 import { PriorityQueue } from "./priorityQueue"
 
 const disposerOfDisposer = function () {
-    throw new Error("Esse dispose já foi destruído.")
+    throw new Error("This dispose has already been destroyed.")
 }
 
+/**
+ * Constants defining the execution priority within the Ticker loop.
+ * Lower numbers run first, higher numbers run last.
+ */
 export const Priority = {
     FIXED_UPDATE: 500,
     UPDATE: 1000,
     RENDER: 10000
 } as const
 
+/** Type representing a Priority value. */
 export type Priority = number
-export type TickerDisposer = { dispose(): void }
+
+/** 
+ * Interface for an object capable of removing a registered listener.
+ */
+export type TickerDisposer = { 
+    /** Unregisters the listener from the Ticker. */
+    dispose(): void 
+}
 
 type Listener = {
     priority: number
     f: (delta: number) => void
 }
 
+/**
+ * The main game loop controller.
+ * Responsible for firing update, fixedUpdate, and render events at the correct intervals.
+ */
 export class Ticker {
     #running = false
 
@@ -38,6 +54,11 @@ export class Ticker {
     #fixedListeners = new PriorityQueue<Listener>()
     #renderListeners = new PriorityQueue<Listener>()
 
+    /**
+     * Creates a new Ticker instance.
+     * @param fps - The target frames per second for general updates (default 60).
+     * @param fixedFPS - The target frames per second for fixed physics updates (default 60).
+     */
     constructor(fps = 60, fixedFPS = 60) {
         this.#fps = fps
         this.#interval = 1000 / fps
@@ -46,7 +67,11 @@ export class Ticker {
         this.#fixedInterval = 1000 / fixedFPS
     }
 
-    start() {
+    /**
+     * Starts the ticker loop. Does nothing if already running.
+     * @example ticker.start();
+     */
+    start(): void {
         if (this.#running) return
 
         this.#running = true
@@ -58,21 +83,46 @@ export class Ticker {
         requestAnimationFrame(this.#loop)
     }
 
-    stop() {
+    /**
+     * Stops the ticker loop.
+     * @example ticker.stop();
+     */
+    stop(): void {
         this.#running = false
     }
 
-    setFPS(fps: number) {
+    /**
+     * Dynamically sets the target FPS for general updates.
+     * @param fps - The new frames per second target.
+     */
+    setFPS(fps: number): void {
         this.#fps = fps
         this.#interval = 1000 / fps
         this.#nextTime = performance.now()
     }
 
-    setFixedFPS(fps: number) {
+    /**
+     * Dynamically sets the target FPS for fixed updates.
+     * @param fps - The new fixed frames per second target.
+     */
+    setFixedFPS(fps: number): void {
         this.#fixedFPS = fps
         this.#fixedInterval = 1000 / fps
     }
 
+    /**
+     * Registers a callback function to be executed by the ticker.
+     * @param callback - The function to call, receiving the time delta (in seconds).
+     * @param priority - The queue to attach to (UPDATE, FIXED_UPDATE, or RENDER).
+     * @returns A disposable object to remove the listener later.
+     * @example
+     * const loopDisposer = ticker.add((delta) => {
+     *   console.log("Updated with delta:", delta);
+     * }, Priority.UPDATE);
+     * 
+     * // To remove:
+     * loopDisposer.dispose();
+     */
     add(callback: (delta: number) => void, priority: Priority = Priority.UPDATE): TickerDisposer {
         const entry: Listener = {
             f: callback,
@@ -99,7 +149,11 @@ export class Ticker {
         return disposer
     }
 
-    resetTime() {
+    /**
+     * Resets the internal time tracking.
+     * Useful if the game was paused for a long time to prevent large delta spikes.
+     */
+    resetTime(): void {
         const now = performance.now()
         this.#lastTime = now
         this.#nextTime = now
