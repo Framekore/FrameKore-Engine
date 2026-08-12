@@ -1,5 +1,11 @@
 # @framekore/core
 
+## 2.0.0
+
+### Major Changes
+
+- 13e5bac: docs
+
 ## 1.0.0
 
 ### Major Changes

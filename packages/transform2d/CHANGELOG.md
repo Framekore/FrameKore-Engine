@@ -1,5 +1,17 @@
 # @framekore/transform2d
 
+## 2.0.0
+
+### Major Changes
+
+- 13e5bac: docs
+
+### Patch Changes
+
+- Updated dependencies [13e5bac]
+  - @framekore/core@2.0.0
+  - @framekore/math@2.0.0
+
 ## 1.0.0
 
 ### Major Changes
