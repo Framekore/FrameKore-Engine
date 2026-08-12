@@ -1,5 +1,15 @@
 # @framekore/render2d
 
+## 0.0.6
+
+### Patch Changes
+
+- 3fa586a: docs
+- Updated dependencies [3fa586a]
+  - @framekore/transform2d@0.0.6
+  - @framekore/core@0.0.6
+  - @framekore/math@0.0.6
+
 ## 2.0.0
 
 ### Major Changes

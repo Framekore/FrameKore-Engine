@@ -1,5 +1,13 @@
 # @framekore/input-manager
 
+## 0.0.6
+
+### Patch Changes
+
+- 3fa586a: docs
+- Updated dependencies [3fa586a]
+  - @framekore/core@0.0.6
+
 ## 2.0.0
 
 ### Major Changes

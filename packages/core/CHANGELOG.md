@@ -1,5 +1,11 @@
 # @framekore/core
 
+## 0.0.6
+
+### Patch Changes
+
+- 3fa586a: docs
+
 ## 2.0.0
 
 ### Major Changes
