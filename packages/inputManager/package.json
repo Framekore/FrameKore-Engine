@@ -6,13 +6,14 @@
     "./dist"
   ],
   "description": "pacote controlador de input",
-  "dependencies": {
+  "peerDependencies": {
     "@framekore/core": "workspace:*"
   },
   "scripts": {
     "build": "tsdown"
   },
   "devDependencies": {
+    "@framekore/core": "workspace:*",
     "tsdown": "^0.22.2",
     "typescript": "~5.9.3"
   },

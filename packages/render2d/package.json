@@ -2,27 +2,30 @@
   "name": "@framekore/render2d",
   "version": "0.0.7",
   "type": "module",
+  "description": "pacote de renderização 2d da engine",
   "files": [
     "./dist"
   ],
-  "description": "pacote de renderização 2d da engine",
-  "scripts": {
-    "build": "tsdown"
-  },
-  "devDependencies": {
-    "tsdown": "^0.22.2",
-    "typescript": "~5.9.3"
-  },
-  "dependencies": {
-    "@framekore/core": "workspace:*",
-    "@framekore/math": "workspace:*",
-    "@framekore/transform2d": "workspace:*"
-  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown"
+  },
+  "peerDependencies": {
+    "@framekore/core": "workspace:*",
+    "@framekore/math": "workspace:*",
+    "@framekore/transform2d": "workspace:*"
+  },
+  "devDependencies": {
+    "@framekore/core": "workspace:*",
+    "@framekore/math": "workspace:*",
+    "@framekore/transform2d": "workspace:*",
+    "tsdown": "^0.22.2",
+    "typescript": "~5.9.3"
   }
 }

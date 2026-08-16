@@ -6,7 +6,7 @@
     "./dist"
   ],
   "description": "pacote de fisica 2d da engine",
-  "dependencies": {
+  "peerDependencies": {
     "@framekore/core": "workspace:*",
     "@framekore/math": "workspace:*",
     "@framekore/transform2d": "workspace:*"
@@ -15,6 +15,9 @@
     "build": "tsdown"
   },
   "devDependencies": {
+    "@framekore/core": "workspace:*",
+    "@framekore/math": "workspace:*",
+    "@framekore/transform2d": "workspace:*",
     "tsdown": "^0.22.2",
     "typescript": "~5.9.3"
   },

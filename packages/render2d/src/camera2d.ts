@@ -1,6 +1,5 @@
-import { Vector2 } from '../../math'
-import { GameObject } from '../../core'
-import { Component } from '../../core'
+import { Vector2 } from '@framekore/math'
+import { GameObject, Component } from '@framekore/core'
 
 export const CAMERA_2D = Symbol("camera2d")
 

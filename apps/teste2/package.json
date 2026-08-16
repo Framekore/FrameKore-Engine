@@ -16,6 +16,7 @@
     "@framekore/asset-manager": "workspace:*",
     "@framekore/core": "workspace:*",
     "@framekore/input-manager": "workspace:*",
+    "@framekore/math": "workspace:*",
     "@framekore/physics2d": "workspace:*",
     "@framekore/render2d": "workspace:*",
     "@framekore/transform2d": "workspace:*"

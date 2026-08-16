@@ -1,63 +1,74 @@
-import { AssetManager } from "@framekore/asset-manager";
-import { Engine, GameObject } from "@framekore/core";
-import playerImage from "../assets/kore.png"
-import { RenderManager2D, Sprite2D, SPRITE_2D, Texture } from "@framekore/render2d";
-import { Transform2D } from "@framekore/transform2d/transform2D";
-import { InputManager } from "@framekore/input-manager";
-import { BOX_COLLIDE_2D, BoxCollide2D, RIGID_BODY_2D, RigidBody2D } from "@framekore/physics2d";
+import { Engine, GameObject } from "@framekore/core"
+import { InputManager } from "@framekore/input-manager"
+import { BoxCollide2D, RigidBody2D, RIGID_BODY_2D } from "@framekore/physics2d"
+import { Sprite2D, RenderManager2D, Texture } from "@framekore/render2d"
+import { Transform2D, TRANSFORM_2D } from "@framekore/transform2d"
+
 
 export class Player extends GameObject {
-    sprite: Sprite2D | null = null
     input: InputManager
     render: RenderManager2D
-    transformer: Transform2D | null = null
-    constructor(engine: Engine) {
+    speed = 200;
+
+    constructor(engine: Engine, texture: Texture) {
         super()
-        this.engine = engine
         this.render = RenderManager2D.get(engine)
         this.input = InputManager.get(engine)
-        const assets = AssetManager.get(engine)
-        assets.load('player', 'image', playerImage).then((img) => {
-            const texture = new Texture(img)
-            texture.slice(23,21)
 
-            this.sprite = new Sprite2D(texture)
-            this.sprite.setFrame(0, 0)
-            this.addComponent(this.sprite)
-        })
-        this.transformer = new Transform2D()
-        this.transformer.position.x = 10
-        this.transformer.position.y = 10
-        this.transformer.scaleX = 2
-        this.transformer.scaleY = 2
-        this.addComponent(this.transformer)
+        const sprite = new Sprite2D(texture)
+        sprite.setFrame(0, 0)
+        this.addComponent(sprite)
+
+        // 2. Configura a posição e escala
+        const transform = new Transform2D()
+        transform.position.x = 10
+        transform.position.y = 10
+        transform.scale.x = 2
+        transform.scale.y = 2
+        this.addComponent(transform)
+
+        // 3. Configura Física e Colisão
         this.addComponent(new BoxCollide2D(23, 21))
-        this.addComponent(new RigidBody2D())
+        
+        const rb = new RigidBody2D()
+        rb.useGravity = false; // Como é um jogo top-down/movimento em 4 direções, desligamos a gravidade.
+        this.addComponent(rb)
     }
+
     update(_delta: number): void {
         super.update(_delta)
-        if ( this.transformer && this.transformer.position.y > this.render.canvas.height) {
-            this.transformer.position.y = 0
-        }
         
+        // Pega o transform de forma segura através do sistema de componentes
+        const transform = this.getComponent<Transform2D>(TRANSFORM_2D);
+        if (transform && transform.position.y > this.render.canvas.height) {
+            transform.position.y = 0
+        }
     }
+
     fixedUpdate(_delta: number): void {
         super.fixedUpdate(_delta)
+        
+        // Recuperamos a física do jogador
+        const rb = this.getComponent<RigidBody2D>(RIGID_BODY_2D);
+        if (!rb) return;
+
+        // Resetamos a velocidade a cada ciclo para que ele pare quando soltar a tecla
+        rb.velocity.x = 0;
+        rb.velocity.y = 0;
+
+        // Controlamos o personagem definindo a velocidade do RigidBody2D,
+        // O PhysicsManager cuidará de atualizar o transform de forma segura e prever as colisões.
         if (this.input.isDown("KeyD")) {
-            if (!this.transformer) return
-                this.transformer.position.x += 4
+            rb.velocity.x = this.speed;
         }
         if (this.input.isDown("KeyA")) {
-            if (!this.transformer) return
-                this.transformer.position.x -= 4
+            rb.velocity.x = -this.speed;
         }
         if (this.input.isDown("KeyS")) {
-            if (!this.transformer) return
-                this.transformer.position.y += 4
+            rb.velocity.y = this.speed;
         }
         if (this.input.isDown("KeyW")) {
-            if (!this.transformer) return
-                this.transformer.position.y -= 4
+            rb.velocity.y = -this.speed;
         }
     }
-} 
+}

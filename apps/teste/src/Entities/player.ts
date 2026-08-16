@@ -3,11 +3,10 @@ import { Engine, GameObject } from "@framekore/core";
 import { Vector2 } from "@framekore/math";
 import { BoxCollide2D, CollisionLayer, RigidBody2D } from "@framekore/physics2d";
 import { Sprite2D, Texture } from "@framekore/render2d";
-import { Transform2D } from "@framekore/transform2d/transform2D";
+import { Transform2D } from "@framekore/transform2d";
 import playerImage from '@/assets/kore.png'
 import { InputManager } from "@framekore/input-manager";
 import { TRANSFORM_2D } from "@framekore/transform2d";
-import { Camera2D } from "@framekore/render2d/camera2d";
 
 export class Player extends GameObject {
     sprite: Sprite2D | null = null

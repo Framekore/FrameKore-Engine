@@ -9,10 +9,11 @@
   "files": [
     "./dist"
   ],
-  "dependencies": {
+  "peerDependencies": {
     "@framekore/core": "workspace:*"
   },
   "devDependencies": {
+    "@framekore/core": "workspace:*",
     "tsdown": "^0.22.2",
     "typescript": "~5.9.3"
   },
