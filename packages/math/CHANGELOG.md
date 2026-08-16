@@ -1,5 +1,11 @@
 # @framekore/math
 
+## 0.0.8
+
+### Patch Changes
+
+- 45640ff: camera2d
+
 ## 0.0.7
 
 ### Patch Changes

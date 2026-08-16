@@ -1,5 +1,15 @@
 # @framekore/render2d
 
+## 0.0.9
+
+### Patch Changes
+
+- 45640ff: camera2d
+- Updated dependencies [45640ff]
+  - @framekore/core@0.0.9
+  - @framekore/math@0.0.8
+  - @framekore/transform2d@0.0.9
+
 ## 0.0.8
 
 ### Patch Changes
