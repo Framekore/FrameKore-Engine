@@ -1,5 +1,15 @@
 # @framekore/physics2d
 
+## 0.0.10
+
+### Patch Changes
+
+- cacbc76: camera2d imported
+- Updated dependencies [cacbc76]
+  - @framekore/core@0.0.10
+  - @framekore/math@0.0.9
+  - @framekore/transform2d@0.0.10
+
 ## 0.0.9
 
 ### Patch Changes
