@@ -102,26 +102,26 @@ importers:
   apps/teste:
     dependencies:
       '@framekore/asset-manager':
-        specifier: ^0.0.8
-        version: 0.0.8(@framekore/core@0.0.8)
+        specifier: workspace:*
+        version: link:../../packages/assetManager
       '@framekore/core':
-        specifier: ^0.0.8
-        version: 0.0.8
+        specifier: workspace:*
+        version: link:../../packages/core
       '@framekore/input-manager':
-        specifier: ^0.0.8
-        version: 0.0.8(@framekore/core@0.0.8)
+        specifier: workspace:*
+        version: link:../../packages/inputManager
       '@framekore/math':
-        specifier: ^0.0.7
-        version: 0.0.7
+        specifier: workspace:*
+        version: link:../../packages/math
       '@framekore/physics2d':
-        specifier: ^0.0.8
-        version: 0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7)(@framekore/transform2d@0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7))
+        specifier: workspace:*
+        version: link:../../packages/physics2d
       '@framekore/render2d':
-        specifier: ^0.0.8
-        version: 0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7)(@framekore/transform2d@0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7))
+        specifier: workspace:*
+        version: link:../../packages/render2d
       '@framekore/transform2d':
-        specifier: ^0.0.8
-        version: 0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7)
+        specifier: workspace:*
+        version: link:../../packages/transform2d
     devDependencies:
       typescript:
         specifier: ~6.0.2
@@ -180,26 +180,26 @@ importers:
   apps/teste4:
     dependencies:
       '@framekore/asset-manager':
-        specifier: ^0.0.8
-        version: 0.0.8(@framekore/core@0.0.8)
+        specifier: ^0.0.9
+        version: 0.0.9(@framekore/core@0.0.9)
       '@framekore/core':
+        specifier: ^0.0.9
+        version: 0.0.9
+      '@framekore/input-manager':
+        specifier: ^0.0.9
+        version: 0.0.9(@framekore/core@0.0.9)
+      '@framekore/math':
         specifier: ^0.0.8
         version: 0.0.8
-      '@framekore/input-manager':
-        specifier: ^0.0.8
-        version: 0.0.8(@framekore/core@0.0.8)
-      '@framekore/math':
-        specifier: ^0.0.7
-        version: 0.0.7
       '@framekore/physics2d':
-        specifier: ^0.0.8
-        version: 0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7)(@framekore/transform2d@0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7))
+        specifier: ^0.0.9
+        version: 0.0.9(@framekore/core@0.0.9)(@framekore/math@0.0.8)(@framekore/transform2d@0.0.9(@framekore/core@0.0.9)(@framekore/math@0.0.8))
       '@framekore/render2d':
-        specifier: ^0.0.8
-        version: 0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7)(@framekore/transform2d@0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7))
+        specifier: ^0.0.9
+        version: 0.0.9(@framekore/core@0.0.9)(@framekore/math@0.0.8)(@framekore/transform2d@0.0.9(@framekore/core@0.0.9)(@framekore/math@0.0.8))
       '@framekore/transform2d':
-        specifier: ^0.0.8
-        version: 0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7)
+        specifier: ^0.0.9
+        version: 0.0.9(@framekore/core@0.0.9)(@framekore/math@0.0.8)
     devDependencies:
       typescript:
         specifier: ~6.0.2
@@ -392,41 +392,41 @@ packages:
   '@emnapi/wasi-threads@1.2.2':
     resolution: {integrity: sha512-c95qOXkHdydNKhscBTebqEC1CVAZpyqOfVfBzQ1qgzyl3gfeldUjIggDbIZgDKsHLgnsM+igH7TJ/eAasaVuMA==}
 
-  '@framekore/asset-manager@0.0.8':
-    resolution: {integrity: sha512-VfEt//RR8Knm+HW5ULGw06wWtcpqu7ywEWoVdEG9oZ5sYpr/dEHp/d86gipFy+zT9JfYYN7FU7k3Gx8QKjKRPA==}
+  '@framekore/asset-manager@0.0.9':
+    resolution: {integrity: sha512-vZ/31jp+0vEpnWqVKFs7cvKfxxDdCcP8/jhRuuxjcoQsFIet+T73PesVKd4c4kwQHbwmhg0ryzfIrgcjnxBNvQ==}
     peerDependencies:
-      '@framekore/core': 0.0.8
+      '@framekore/core': 0.0.9
 
-  '@framekore/core@0.0.8':
-    resolution: {integrity: sha512-u1BNzwqnNhRE1qpoEzfjPEb415Z8pr0UFk9MvJZkGSuxJHJyYKpZElQggcyb1Uw8NfWuDPn5uihqnVaGPO6LUw==}
+  '@framekore/core@0.0.9':
+    resolution: {integrity: sha512-8YP769sqyB+XTH1QlCNK4LPy7eQp1L3uxOEO8Z5A3jooRmGPbxttThBnNCIifQ8NMpyRVQl6newvAA4GfxPExg==}
 
-  '@framekore/input-manager@0.0.8':
-    resolution: {integrity: sha512-k0tbMQxVGt9hd2jFzLW9RXtl7zXZttmTM8hjoltOOhlUeiitvsjxzqTM7xBGBYOWAXlS82FH3usP59xb/XXqeg==}
+  '@framekore/input-manager@0.0.9':
+    resolution: {integrity: sha512-LcOK4BEFlHhyvLSnhm+lkJQoqEHzRJYh1YG/lIdiOo3tVc2u4UGg9ir+JjL55v/4SgQ1tvMHJ5YusVrjE5ZmFA==}
     peerDependencies:
-      '@framekore/core': 0.0.8
+      '@framekore/core': 0.0.9
 
-  '@framekore/math@0.0.7':
-    resolution: {integrity: sha512-RaTpnLQhNOq1iPLqf3p0uguzBFHGSKBA8u/9orU+1IoGWERqdb5S1nUE39FI/9Y4R+Hi9ENS5EtxpOXxbC2zOA==}
+  '@framekore/math@0.0.8':
+    resolution: {integrity: sha512-XG8oqmUPfqN79D4HOge1w9Dq7g1YSyNyHzSc6RkiKrW976ibHjzGcR/p4KkhwgcDEELdeGktcQqn/iP6Wn7jQg==}
 
-  '@framekore/physics2d@0.0.8':
-    resolution: {integrity: sha512-oChASVm04coD60RrXVZMhSy1G7clyGL2Gf+B93PQ/Uj8RsWCcxKUsLxr5gmadKzhyjsvpgjhXKnLoCIpYgPKFg==}
+  '@framekore/physics2d@0.0.9':
+    resolution: {integrity: sha512-Egi+tyxR2hIj4AA89g942PLh0e/rMpKIOwVoMHyni3Es8lD/YWDCfxDRWWVDL5k1WP6ZiFxgHYio2EzlZYnDQw==}
     peerDependencies:
-      '@framekore/core': 0.0.8
-      '@framekore/math': 0.0.7
-      '@framekore/transform2d': 0.0.8
+      '@framekore/core': 0.0.9
+      '@framekore/math': 0.0.8
+      '@framekore/transform2d': 0.0.9
 
-  '@framekore/render2d@0.0.8':
-    resolution: {integrity: sha512-nqTLRX7zhB2qOAdUvHZFlwYQaIUkKHV931YMqFQZWxbiFRp07/Ry8I1SgZ0zUi1wg3lkNgF5RvpQ3u7a8jOG5A==}
+  '@framekore/render2d@0.0.9':
+    resolution: {integrity: sha512-WaYCta/hhccotCjjykl8oaj72aW2qiIA0RJ/ooevF7SSUg43mEdylHow+0Vei34fdkcdxlJU7Is/NuyeaZTLpA==}
     peerDependencies:
-      '@framekore/core': 0.0.8
-      '@framekore/math': 0.0.7
-      '@framekore/transform2d': 0.0.8
+      '@framekore/core': 0.0.9
+      '@framekore/math': 0.0.8
+      '@framekore/transform2d': 0.0.9
 
-  '@framekore/transform2d@0.0.8':
-    resolution: {integrity: sha512-PPg1mNf9iMAsQh2OQRXKSj/oQrJlREneAD4sCz5GpIjXAaBBWRN9NpAAxEb3KO1JGPPT7b66pZMLfsBkeQiVhQ==}
+  '@framekore/transform2d@0.0.9':
+    resolution: {integrity: sha512-DNP0odXrSKhn42TYJjhujNtTJxFAbbt0cnC0a/BNqOUWuZiRTZXX4J2vN/oYzSE0WLgMzNx5jIahj4oA699sEg==}
     peerDependencies:
-      '@framekore/core': 0.0.8
-      '@framekore/math': 0.0.7
+      '@framekore/core': 0.0.9
+      '@framekore/math': 0.0.8
 
   '@inquirer/external-editor@1.0.3':
     resolution: {integrity: sha512-RWbSrDiYmO4LbejWY7ttpxczuwQyZLBUyygsA9Nsv95hpzUWwnNTVQmAq3xuh7vNwCp07UTmE5i11XAEExx4RA==}
@@ -1466,34 +1466,34 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@framekore/asset-manager@0.0.8(@framekore/core@0.0.8)':
+  '@framekore/asset-manager@0.0.9(@framekore/core@0.0.9)':
     dependencies:
-      '@framekore/core': 0.0.8
+      '@framekore/core': 0.0.9
 
-  '@framekore/core@0.0.8': {}
+  '@framekore/core@0.0.9': {}
 
-  '@framekore/input-manager@0.0.8(@framekore/core@0.0.8)':
+  '@framekore/input-manager@0.0.9(@framekore/core@0.0.9)':
     dependencies:
-      '@framekore/core': 0.0.8
+      '@framekore/core': 0.0.9
 
-  '@framekore/math@0.0.7': {}
+  '@framekore/math@0.0.8': {}
 
-  '@framekore/physics2d@0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7)(@framekore/transform2d@0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7))':
+  '@framekore/physics2d@0.0.9(@framekore/core@0.0.9)(@framekore/math@0.0.8)(@framekore/transform2d@0.0.9(@framekore/core@0.0.9)(@framekore/math@0.0.8))':
     dependencies:
-      '@framekore/core': 0.0.8
-      '@framekore/math': 0.0.7
-      '@framekore/transform2d': 0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7)
+      '@framekore/core': 0.0.9
+      '@framekore/math': 0.0.8
+      '@framekore/transform2d': 0.0.9(@framekore/core@0.0.9)(@framekore/math@0.0.8)
 
-  '@framekore/render2d@0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7)(@framekore/transform2d@0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7))':
+  '@framekore/render2d@0.0.9(@framekore/core@0.0.9)(@framekore/math@0.0.8)(@framekore/transform2d@0.0.9(@framekore/core@0.0.9)(@framekore/math@0.0.8))':
     dependencies:
-      '@framekore/core': 0.0.8
-      '@framekore/math': 0.0.7
-      '@framekore/transform2d': 0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7)
+      '@framekore/core': 0.0.9
+      '@framekore/math': 0.0.8
+      '@framekore/transform2d': 0.0.9(@framekore/core@0.0.9)(@framekore/math@0.0.8)
 
-  '@framekore/transform2d@0.0.8(@framekore/core@0.0.8)(@framekore/math@0.0.7)':
+  '@framekore/transform2d@0.0.9(@framekore/core@0.0.9)(@framekore/math@0.0.8)':
     dependencies:
-      '@framekore/core': 0.0.8
-      '@framekore/math': 0.0.7
+      '@framekore/core': 0.0.9
+      '@framekore/math': 0.0.8
 
   '@inquirer/external-editor@1.0.3(@types/node@25.5.0)':
     dependencies:
