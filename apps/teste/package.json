@@ -9,17 +9,16 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "typescript": "~5.9.3",
-    "vite": "^8.0.1"
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0"
   },
   "dependencies": {
-    "@framekore/asset-manager": "workspace:*",
-    "@framekore/core": "workspace:*",
-    "@framekore/input-manager": "workspace:*",
-    "@framekore/math": "workspace:*",
-    "@framekore/physics2d": "workspace:*",
-    "@framekore/render2d": "workspace:*",
-    "@framekore/transform2d": "workspace:*",
-    "@types/node": "^25.5.0"
+    "@framekore/asset-manager": "^0.0.8",
+    "@framekore/core": "^0.0.8",
+    "@framekore/input-manager": "^0.0.8",
+    "@framekore/math": "^0.0.7",
+    "@framekore/physics2d": "^0.0.8",
+    "@framekore/render2d": "^0.0.8",
+    "@framekore/transform2d": "^0.0.8"
   }
 }

@@ -3,7 +3,7 @@ import { Player } from "../Entities/player";
 import { Collision } from "../Entities/collision";
 import { NPC } from "../Entities/npc";
 import { Vector2 } from "@framekore/math";
-import { RenderManager2D, SPRITE_2D,  } from "@framekore/render2d";
+import { RenderManager2D, SPRITE_2D } from "@framekore/render2d";
 import { Transform2D, TRANSFORM_2D } from "@framekore/transform2d";
 import { BOX_COLLIDE_2D, type BoxCollide2D } from "@framekore/physics2d";
 
