@@ -1,5 +1,13 @@
 # @framekore/input-manager
 
+## 0.0.8
+
+### Patch Changes
+
+- 756a15c: peerDep
+- Updated dependencies [756a15c]
+  - @framekore/core@0.0.8
+
 ## 0.0.7
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @framekore/core
 
+## 0.0.8
+
+### Patch Changes
+
+- 756a15c: peerDep
+
 ## 0.0.7
 
 ### Patch Changes
