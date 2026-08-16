@@ -3,3 +3,11 @@ packages:
   - "apps/*"
 allowBuilds:
   esbuild: true
+minimumReleaseAgeExclude:
+  - '@framekore/asset-manager@0.0.7'
+  - '@framekore/core@0.0.7'
+  - '@framekore/input-manager@0.0.7'
+  - '@framekore/math@0.0.7'
+  - '@framekore/physics2d@0.0.7'
+  - '@framekore/render2d@0.0.7'
+  - '@framekore/transform2d@0.0.7'
