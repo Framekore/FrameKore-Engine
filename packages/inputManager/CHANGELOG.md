@@ -1,5 +1,13 @@
 # @framekore/input-manager
 
+## 0.0.7
+
+### Patch Changes
+
+- 0cddbfe: readme.md in packages
+- Updated dependencies [0cddbfe]
+  - @framekore/core@0.0.7
+
 ## 0.0.6
 
 ### Patch Changes

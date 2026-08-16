@@ -1,5 +1,11 @@
 # @framekore/core
 
+## 0.0.7
+
+### Patch Changes
+
+- 0cddbfe: readme.md in packages
+
 ## 0.0.6
 
 ### Patch Changes
