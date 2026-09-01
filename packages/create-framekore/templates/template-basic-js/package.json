@@ -1,0 +1,23 @@
+{
+  "name": "template-basic-kit-js",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^8.2.2"
+  },
+  "dependencies": {
+    "@framekore/asset-manager": "^0.0.10",
+    "@framekore/core": "^0.0.10",
+    "@framekore/input-manager": "^0.0.10",
+    "@framekore/math": "^0.0.9",
+    "@framekore/physics2d": "^0.0.10",
+    "@framekore/render2d": "^0.0.10",
+    "@framekore/transform2d": "^0.0.10"
+  }
+}
