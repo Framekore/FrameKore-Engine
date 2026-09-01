@@ -1,7 +1,7 @@
 {
   "name": "teste4",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,12 +13,6 @@
     "vite": "^8.2.0"
   },
   "dependencies": {
-    "@framekore/asset-manager": "^0.0.10",
-    "@framekore/core": "^0.0.10",
-    "@framekore/input-manager": "^0.0.10",
-    "@framekore/math": "^0.0.9",
-    "@framekore/physics2d": "^0.0.10",
-    "@framekore/render2d": "^0.0.10",
-    "@framekore/transform2d": "^0.0.10"
+    "@framekore/core": "^0.0.10"
   }
 }
