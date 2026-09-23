@@ -1,5 +1,13 @@
 # @framekore/input-manager
 
+## 0.0.11
+
+### Patch Changes
+
+- 443aa46: ajustes do components e adições de funcionalidades de input
+- Updated dependencies [443aa46]
+  - @framekore/core@0.0.11
+
 ## 0.0.10
 
 ### Patch Changes

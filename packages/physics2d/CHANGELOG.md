@@ -1,5 +1,13 @@
 # @framekore/physics2d
 
+## 0.0.11
+
+### Patch Changes
+
+- Updated dependencies [443aa46]
+  - @framekore/core@0.0.11
+  - @framekore/transform2d@0.0.11
+
 ## 0.0.10
 
 ### Patch Changes

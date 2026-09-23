@@ -1,5 +1,11 @@
 # @framekore/core
 
+## 0.0.11
+
+### Patch Changes
+
+- 443aa46: ajustes do components e adições de funcionalidades de input
+
 ## 0.0.10
 
 ### Patch Changes
