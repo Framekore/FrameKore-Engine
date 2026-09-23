@@ -175,15 +175,27 @@ export class GameObject {
 
     /**
      * Called every frame during the update cycle.
-     * Override this method to add custom frame-by-frame logic to the GameObject.
-     * @param _delta - The time elapsed since the last frame.
+     * Propagates the update cycle to all attached components.
+     * @param delta - The time elapsed since the last frame.
      */
-    update(_delta: number): void {}
+    update(delta: number): void {
+        for (const component of this.#components.values()) {
+            if (typeof component.update === 'function') {
+                component.update(delta)
+            }
+        }
+    }
 
     /**
      * Called at fixed time intervals during the fixedUpdate cycle.
-     * Override this method to add physics or time-consistent logic to the GameObject.
-     * @param _delta - The fixed time step.
+     * Propagates the fixed update cycle to all attached components.
+     * @param delta - The fixed time step.
      */
-    fixedUpdate(_delta: number): void {}
+    fixedUpdate(delta: number): void {
+        for (const component of this.#components.values()) {
+            if (typeof component.fixedUpdate === 'function') {
+                component.fixedUpdate(delta)
+            }
+        }
+    }
 }

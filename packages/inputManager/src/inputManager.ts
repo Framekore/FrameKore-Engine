@@ -7,12 +7,16 @@ import { definePlugin, type Engine } from "@framekore/core";
  * @example
  * engine.use(inputPlugin());
  */
-export const inputPlugin = definePlugin(()=>{
+export const inputPlugin = definePlugin(() => {
     return {
         name: "input",
         setup(engine) {
             const input = new InputManager()
             engine.setResource(InputManager, input)
+        },
+        update(engine) {
+            const input = engine.getResource(InputManager)
+            input?.update()
         },
         destroy(engine) {
             const input = engine.getResource(InputManager)
@@ -27,7 +31,9 @@ export const inputPlugin = definePlugin(()=>{
  */
 export class InputManager {
     #keys = new Set<string>();
-    
+    #justReleased = new Set<string>();
+    #justPressed = new Set<string>();
+
     /**
      * @internal Created automatically by the `inputPlugin`.
      */
@@ -45,13 +51,17 @@ export class InputManager {
      * const input = InputManager.get(engine);
      * if (input.isDown("ArrowUp")) { ... }
      */
-    static get(engine: Engine): InputManager{
+    static get(engine: Engine): InputManager {
         const input = engine.getResource(InputManager)
         if (!input) throw new Error("InputPlugin has not been added to the Engine.")
         return input
     }
 
     #onKeyDown = (e: KeyboardEvent) => {
+        // Evita registrar múltiplos justPressed se o usuário segurar a tecla (auto-repeat do SO)
+        if (!this.#keys.has(e.code)) {
+            this.#justPressed.add(e.code)
+        }
         this.#keys.add(e.code)
     }
 
@@ -70,6 +80,44 @@ export class InputManager {
      */
     isDown(code: string): boolean {
         return this.#keys.has(code)
+    }
+
+    /**
+     * Checks if a specific key is not currently being pressed down.
+     * @param code - The KeyboardEvent.code string (e.g., "KeyW", "ArrowUp", "Space").
+     * @returns True if the key is NOT pressed, false otherwise.
+     * @example
+     * if (input.isUp("Space")) {
+     *   // Ação a ser executada enquanto a tecla não estiver pressionada
+     * }
+     */
+    isUp(code: string): boolean {
+        return !this.#keys.has(code)
+    }
+
+    /**
+     * Checks if a specific key was pressed down in the current frame.
+     * Ideal for single-trigger actions like jumping or shooting.
+     * @param code - The KeyboardEvent.code string.
+     */
+    isJustDown(code: string): boolean {
+        return this.#justPressed.has(code)
+    }
+
+    /**
+     * Checks if a specific key was released in the current frame.
+     * @param code - The KeyboardEvent.code string.
+     */
+    isJustUp(code: string): boolean {
+        return this.#justReleased.has(code)
+    }
+
+    /**
+     * @internal
+     */
+    update(): void {
+        this.#justPressed.clear()
+        this.#justReleased.clear()
     }
 
     /**

@@ -14,6 +14,9 @@ importers:
       '@clack/prompts':
         specifier: ^0.8.0
         version: 0.8.2
+      create-framekore:
+        specifier: 'link:'
+        version: 'link:'
       picocolors:
         specifier: ^1.1.0
         version: 1.1.1

@@ -9,6 +9,9 @@
   "bin": {
     "create-framekore": "./dist/index.js"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist",
     "templates"
@@ -19,6 +22,7 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.8.0",
+    "create-framekore": "link:",
     "picocolors": "^1.1.0"
   },
   "devDependencies": {

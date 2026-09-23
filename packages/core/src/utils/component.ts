@@ -23,4 +23,18 @@ export abstract class Component {
      * Override this to clean up resources or event listeners.
      */
     onRemoved?(): void
+
+    /**
+     * Called every frame during the engine's main update loop.
+     * Override this to implement frame-by-frame logic (e.g., animation updates, input handling, non-physics movement).
+     * @param delta - The time elapsed since the last frame (in seconds).
+     */
+    update?(delta: number): void
+
+    /**
+     * Called at fixed time intervals during the engine's physics cycle.
+     * Override this to implement physics calculations, collisions, or deterministic logic.
+     * @param delta - The fixed time step (in seconds).
+     */
+    fixedUpdate?(delta: number): void
 }
