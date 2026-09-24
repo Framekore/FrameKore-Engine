@@ -1,5 +1,11 @@
 # @framekore/math
 
+## 0.0.10
+
+### Patch Changes
+
+- 2347a5b: up
+
 ## 0.0.9
 
 ### Patch Changes
