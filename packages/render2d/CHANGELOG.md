@@ -1,5 +1,11 @@
 # @framekore/render2d
 
+## 0.0.12
+
+### Patch Changes
+
+- 5a8a716: render anchor and applyforce(x,y)
+
 ## 0.0.11
 
 ### Patch Changes
