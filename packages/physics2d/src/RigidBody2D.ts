@@ -47,7 +47,7 @@ export class RigidBody2D extends Component {
      * @example
      * const rb = gameObject.getComponent(RigidBody2D);
      * // Jump by applying an upward force
-     * rb.applyForce(new Vector2(0, -500));
+     * rb.applyForce(0, -500);
      */
     applyForce(x: number, y: number): void {
         this.velocity.x += x / this.mass
