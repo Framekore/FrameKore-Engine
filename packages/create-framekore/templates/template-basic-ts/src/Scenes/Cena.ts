@@ -75,7 +75,7 @@ export class Cena extends Scene {
     }
 
     #handleJump() {
-        this.player.body.applyForce(new Vector2(0, -500))
+        this.player.body.applyForce(0, -500)
         this.count++;
     }
 }

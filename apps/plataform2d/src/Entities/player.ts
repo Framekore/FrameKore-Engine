@@ -79,7 +79,7 @@ export class Player extends GameObject {
         if (!this.body) return
         if (!this.body.touching.bottom) return
 
-        this.body.applyForce(new Vector2(0, -this.JUMP_FORCE))
+        this.body.applyForce(0, -this.JUMP_FORCE)
     }
 
 }
