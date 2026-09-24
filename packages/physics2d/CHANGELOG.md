@@ -1,5 +1,11 @@
 # @framekore/physics2d
 
+## 0.0.13
+
+### Patch Changes
+
+- 6089a9c: applyForce
+
 ## 0.0.12
 
 ### Patch Changes
