@@ -49,8 +49,8 @@ export class RigidBody2D extends Component {
      * // Jump by applying an upward force
      * rb.applyForce(new Vector2(0, -500));
      */
-    applyForce(force: Vector2): void {
-        this.velocity.x += force.x / this.mass
-        this.velocity.y += force.y / this.mass
+    applyForce(x: number, y: number): void {
+        this.velocity.x += x / this.mass
+        this.velocity.y += y / this.mass
     }
 }

@@ -1,5 +1,6 @@
 import { Component } from "@framekore/core";
 import type { Frame, Texture } from "./texture";
+import { Vector2 } from "@framekore/math";
 
 export const SPRITE_2D = Symbol("sprite2d")
 
@@ -25,6 +26,13 @@ export class Sprite2D extends Component {
     frame?: Frame
 
     /**
+     * Ponto de ancoragem/pivô do sprite (de 0 a 1).
+     * (0.5, 0.5) = Centro | (0, 0) = Canto Superior Esquerdo (Top-Left)
+     * Padrão: (0.5, 0.5)
+     */
+    #anchor: Vector2 = new Vector2(0.5, 0.5);
+
+    /**
      * Creates a new Sprite2D component.
      * @param texture - The Texture object containing the image data.
      * @example
@@ -35,6 +43,21 @@ export class Sprite2D extends Component {
     constructor(texture: Texture) {
         super()
         this.texture = texture
+    }
+
+    /**
+     * Sets the anchor origin of the Sprite relative to its dimensions.
+     * @param x - X anchor (0 = left, 0.5 = center, 1 = right).
+     * @param y - Y anchor (0 = top, 0.5 = center, 1 = bottom).
+     * @example sprite.setOrigin(0, 0); // Sets origin to top-left
+     */
+    setAnchor(x: number, y: number): void {
+        this.#anchor.x = x
+        this.#anchor.y = y
+    }
+
+    getAnchor() {
+        return this.#anchor
     }
 
     /**

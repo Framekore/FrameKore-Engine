@@ -180,7 +180,7 @@ export class RenderManager2D {
         let desiredY = transform.position.y
 
         const zoomDiff = camera.targetZoom - camera.zoom
-        camera.zoom += zoomDiff * Math.min(1,camera.zoomSpeed * delta)
+        camera.zoom += zoomDiff * Math.min(1, camera.zoomSpeed * delta)
         camera.zoom = this.#clamp(camera.zoom, camera.minZoom, camera.maxZoom)
 
         if (camera.deadZoneWidth > 0) {
@@ -299,21 +299,43 @@ export class RenderManager2D {
         this.#screenDrawQueue.length = 0
     }
 
+    // #renderSprite(transform: ITransform2D, sprite: Sprite2D) {
+    //     const f = sprite.frame!
+
+    //     this.ctx.save()
+
+    //     this.ctx.translate(transform.position.x, transform.position.y)
+    //     this.ctx.rotate(transform.rotation)
+    //     this.ctx.scale(transform.scale.x, transform.scale.y)
+
+    //     this.ctx.drawImage(
+    //         sprite.texture.image,
+    //         f.x, f.y, f.width, f.height,
+    //         -f.width / 2, -f.height / 2, f.width, f.height
+    //     )
+    //     this.ctx.restore()
+    // }
+
     #renderSprite(transform: ITransform2D, sprite: Sprite2D) {
-        const f = sprite.frame!
+        const f = sprite.frame!;
 
-        this.ctx.save()
+        this.ctx.save();
 
-        this.ctx.translate(transform.position.x, transform.position.y)
-        this.ctx.rotate(transform.rotation)
-        this.ctx.scale(transform.scale.x, transform.scale.y)
+        this.ctx.translate(transform.position.x, transform.position.y);
+        this.ctx.rotate(transform.rotation);
+        this.ctx.scale(transform.scale.x, transform.scale.y);
+
+        // Calcula o offset com base no anchor (pivô) do Sprite
+        const offsetX = -f.width * sprite.getAnchor().x;
+        const offsetY = -f.height * sprite.getAnchor().y;
 
         this.ctx.drawImage(
             sprite.texture.image,
             f.x, f.y, f.width, f.height,
-            -f.width/2, -f.height/2, f.width, f.height
-        )
-        this.ctx.restore()
+            offsetX, offsetY, f.width, f.height
+        );
+
+        this.ctx.restore();
     }
 
     #renderObjects(obj: GameObject) {
