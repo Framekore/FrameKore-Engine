@@ -1,14 +1,18 @@
 import { Component } from "@framekore/core";
 import type { Frame, Texture } from "./texture";
 import { Vector2 } from "@framekore/math";
+import { Renderable2D } from "./renderable2D";
+import { Transform2D } from "@framekore/transform2d";
 
 export const SPRITE_2D = Symbol("sprite2d")
+
+
 
 /**
  * Component used to render a static 2D image (sprite) from a texture.
  * To be visible, the GameObject must also have a Transform2D component.
  */
-export class Sprite2D extends Component {
+export class Sprite2D extends Renderable2D {
     /** 
      * Unique symbol key identifying this component. 
      */
@@ -25,12 +29,16 @@ export class Sprite2D extends Component {
      */
     frame?: Frame
 
-    /**
-     * Ponto de ancoragem/pivô do sprite (de 0 a 1).
-     * (0.5, 0.5) = Centro | (0, 0) = Canto Superior Esquerdo (Top-Left)
-     * Padrão: (0.5, 0.5)
-     */
     #anchor: Vector2 = new Vector2(0.5, 0.5);
+
+    /** Flips the sprite horizontally across its anchor point. Default is `false`. */
+    public flipX: boolean = false;
+
+    /** Flips the sprite vertically across its anchor point. Default is `false`. */
+    public flipY: boolean = false;
+
+    /** Opacity multiplier ranging from 0.0 (fully transparent) to 1.0 (fully opaque). Default is `1.0`. */
+    public alpha: number = 1.0;
 
     /**
      * Creates a new Sprite2D component.
@@ -56,7 +64,12 @@ export class Sprite2D extends Component {
         this.#anchor.y = y
     }
 
-    getAnchor() {
+    /**
+     * Ponto de ancoragem/pivô do sprite (de 0 a 1).
+     * (0.5, 0.5) = Centro | (0, 0) = Canto Superior Esquerdo (Top-Left)
+     * Padrão: (0.5, 0.5)
+     */
+    get anchor() {
         return this.#anchor
     }
 
@@ -82,5 +95,64 @@ export class Sprite2D extends Component {
      */
     setFrameByName(name: string): void {
         this.frame = this.texture.getFrameByName(name)
+    }
+
+    /**
+     * Renders the active texture frame to the Canvas 2D context.
+     *
+     * Applies pixel rounding (`Math.round`) to source frame coordinates, origin offsets,
+     * and world positions retrieved from the parent GameObject's `Transform2D` component.
+     * Disables image smoothing to ensure crisp pixel art output without sub-pixel artifacts.
+     *
+     * @param ctx - The target CanvasRenderingContext2D instance.
+     * @returns Void. Aborts early if the component is hidden, lacks a texture, or if no `Transform2D` exists on the parent GameObject.
+    */
+    /**
+     * Renders the sprite to the Canvas 2D context with pixel-snapping, orientation flips, and opacity.
+     * @param ctx - Target CanvasRenderingContext2D instance.
+     */
+    override render(ctx: CanvasRenderingContext2D): void {
+        if (!this.visible || this.alpha <= 0 || !this.texture || !this.gameObject) return;
+
+        const transform = this.gameObject.getComponent(Transform2D);
+        if (!transform) return;
+
+        const srcX = this.frame?.x ?? 0;
+        const srcY = this.frame?.y ?? 0;
+        const srcW = this.frame?.width ?? this.texture.width;
+        const srcH = this.frame?.height ?? this.texture.height;
+
+        const offsetX = Math.round(-srcW * this.anchor.x);
+        const offsetY = Math.round(-srcH * this.anchor.y);
+
+        ctx.save();
+        ctx.imageSmoothingEnabled = false;
+
+        ctx.globalAlpha *= Math.max(0, Math.min(1, this.alpha));
+
+        ctx.translate(
+            Math.round(transform.position.x),
+            Math.round(transform.position.y)
+        );
+
+        ctx.rotate(transform.rotation);
+
+        const scaleX = transform.scale.x * (this.flipX ? -1 : 1);
+        const scaleY = transform.scale.y * (this.flipY ? -1 : 1);
+        ctx.scale(scaleX, scaleY);
+
+        ctx.drawImage(
+            this.texture.image,
+            Math.round(srcX),
+            Math.round(srcY),
+            srcW,
+            srcH,
+            offsetX,
+            offsetY,
+            srcW,
+            srcH
+        );
+
+        ctx.restore();
     }
 }

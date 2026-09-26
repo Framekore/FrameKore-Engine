@@ -326,8 +326,8 @@ export class RenderManager2D {
         this.ctx.scale(transform.scale.x, transform.scale.y);
 
         // Calcula o offset com base no anchor (pivô) do Sprite
-        const offsetX = -f.width * sprite.getAnchor().x;
-        const offsetY = -f.height * sprite.getAnchor().y;
+        const offsetX = -f.width * sprite.anchor.x;
+        const offsetY = -f.height * sprite.anchor.y;
 
         this.ctx.drawImage(
             sprite.texture.image,

@@ -25,7 +25,10 @@ export class AnimatedSprite2D extends Sprite2D {
      * Determines whether the animation is currently progressing.
      * If false, the animation stays on the current frame.
      */
-    playing = true;
+    #playing = true;
+
+    /** Determines whether the animation loops when reaching the last frame. */
+    loop = true
 
     /**
      * Appends a new frame to the animation sequence based on texture grid coordinates.
@@ -42,43 +45,34 @@ export class AnimatedSprite2D extends Sprite2D {
         if (frame) {
             this.#frames.push(frame);
             // Set the first added frame as the current visual frame
-            if (this.#frames.length === 1) this.frame = frame;
+            if (this.#frames.length === 1) 
+                this.frame = frame;
         }
     }
 
-    /**
-     * Updates the animation state based on elapsed time.
-     * Typically called internally by the engine's update loop or by a custom component.
-     * @param delta - Time elapsed since the last frame update (in seconds).
-     */
-    update(delta: number): void {
-        if (!this.playing || this.#frames.length === 0) return;
-
-        this.#elapsed += delta;
-        const frameDuration = 1 / this.fps;
-
-        // Loop to handle cases where delta is larger than frame duration (catch-up)
-        while (this.#elapsed >= frameDuration) {
-            this.#elapsed -= frameDuration;
-            this.#currentFrame = (this.#currentFrame + 1) % this.#frames.length;
-            this.frame = this.#frames[this.#currentFrame];
+    reset(): void {
+        this.#currentFrame = 0;
+        this.#elapsed = 0;
+        if (this.#frames.length > 0) {
+            this.frame = this.#frames[0];
         }
     }
 
+    
     /**
      * Starts or resumes the animation playback.
      * @example animatedSprite.play();
-     */
-    play(): void {
-        this.playing = true;
+    */
+   play(): void {
+       this.#playing = true;
     }
 
     /**
      * Pauses the animation on its current frame.
      * @example animatedSprite.stop();
-     */
-    stop(): void {
-        this.playing = false;
+    */
+   stop(): void {
+       this.#playing = false;
     }
 
     /**
@@ -88,12 +82,37 @@ export class AnimatedSprite2D extends Sprite2D {
      * @example
      * // Jump to the third frame added to the animation sequence
      * animatedSprite.setFrame(2);
-     */
+    */
     setFrame(index: number): void {
         if (index >= 0 && index < this.#frames.length) {
             this.#currentFrame = index;
             this.frame = this.#frames[index];
             this.#elapsed = 0;
         }
+    }
+    /**
+     * Updates the internal timer accumulator and advances frames according to delta time.
+     * @param delta - Time elapsed since the last frame in seconds.
+     */
+    update(delta: number): void {
+        if (!this.#playing || this.#frames.length <= 1) return;
+
+        this.#elapsed += delta;
+        const frameDuration = 1 / this.fps;
+
+        while (this.#elapsed >= frameDuration) {
+            this.#elapsed -= frameDuration;
+
+            if (this.#currentFrame < this.#frames.length - 1) {
+                this.#currentFrame++;
+            } else if (this.loop) {
+                this.#currentFrame = 0;
+            } else {
+                this.#playing = false;
+                break;
+            }
+        }
+
+        this.frame = this.#frames[this.#currentFrame];
     }
 }

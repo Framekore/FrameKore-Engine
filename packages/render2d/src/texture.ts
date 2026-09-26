@@ -60,6 +60,14 @@ export class Texture {
         }
     }
 
+    get width(): number {
+        return this.image.width
+    }
+
+    get height(): number {
+        return this.image.height
+    }
+    
     /**
      * Retrieves a frame by its grid coordinates (column, row).
      * The texture must be sliced using `slice()` beforehand.
@@ -91,7 +99,7 @@ export class Texture {
     /**
      * Retrieves a frame by its defined alias name.
      * The frame must have been aliased using `define()` beforehand.
-     * @param name - The custom alias name.
+     * @param name - The custom alnão consegue deletar a propria ias name.
      * @returns The Frame object, or undefined if not found.
      * @example
      * const runFrame = texture.getFrameByName("player_run_1");

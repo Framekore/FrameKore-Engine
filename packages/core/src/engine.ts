@@ -69,6 +69,9 @@ export interface IDebuggable {
     }
 }
 
+export type ComponentCallback = (component: Component) => void;
+export type RenderCallback = () => void;
+
 /**
  * The core Engine class.
  * It manages scenes, plugins, resources, and the main game loop (ticker).
@@ -78,6 +81,9 @@ export class Engine {
     #currentScene?: Scene
     #plugins = new Map<string, EnginePlugin>()
     #resources = new Map<any, any>()
+    #componentAddedListeners = new Set<ComponentCallback>();
+    #componentRemovedListeners = new Set<ComponentCallback>();
+    #renderListeners = new Set<RenderCallback>();
 
     constructor() {
         this.#ticker = new Ticker()
@@ -220,22 +226,58 @@ export class Engine {
     }
 
     /**
-     * Notifies all plugins that a new component has been added.
+     * Subscribes a listener to be executed when any component is added to a GameObject.
+     * @param listener - Callback function receiving the added Component.
+     * @returns Cleanup function to unsubscribe the listener.
+     */
+    onComponentAdded(listener: ComponentCallback): () => void {
+        this.#componentAddedListeners.add(listener);
+        return () => this.#componentAddedListeners.delete(listener);
+    }
+
+    /**
+     * Subscribes a listener to be executed when any component is removed from a GameObject.
+     * @param listener - Callback function receiving the removed Component.
+     * @returns Cleanup function to unsubscribe the listener.
+     */
+    onComponentRemoved(listener: ComponentCallback): () => void {
+        this.#componentRemovedListeners.add(listener);
+        return () => this.#componentRemovedListeners.delete(listener);
+    }
+
+    /**
+     * Subscribes a listener to be executed during the render phase of the engine loop.
+     * @param listener - Callback function executed during render step.
+     * @returns Cleanup function to unsubscribe the listener.
+     */
+    onRender(listener: RenderCallback): () => void {
+        this.#renderListeners.add(listener);
+        return () => this.#renderListeners.delete(listener);
+    }
+
+    /**
+     * Notifies engine listeners and plugins that a new component has been added.
      * Typically called internally by GameObjects.
      * @param component - The added component.
      */
     notifyComponentAdded(component: Component): void {
+        for (const listener of this.#componentAddedListeners) {
+            listener(component)
+        }
         for (const plugin of this.#plugins.values()) {
             plugin.onComponentAdded?.(component)
         }
     }
 
     /**
-     * Notifies all plugins that a component has been removed.
+     * Notifies engine listeners and plugins that a component has been removed.
      * Typically called internally by GameObjects.
      * @param component - The removed component.
      */
     notifyComponentRemoved(component: Component): void {
+        for (const listener of this.#componentRemovedListeners) {
+            listener(component)
+        }
         for (const plugin of this.#plugins.values()) {
             plugin.onComponentRemoved?.(component)
         }
