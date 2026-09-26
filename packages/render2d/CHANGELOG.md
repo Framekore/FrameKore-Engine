@@ -1,5 +1,14 @@
 # @framekore/render2d
 
+## 0.0.15
+
+### Patch Changes
+
+- 3731d07: update
+- Updated dependencies [3731d07]
+  - @framekore/core@0.0.14
+  - @framekore/transform2d@0.0.14
+
 ## 0.0.14
 
 ### Patch Changes

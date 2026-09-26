@@ -1,5 +1,12 @@
 # @framekore/input-manager
 
+## 0.0.14
+
+### Patch Changes
+
+- Updated dependencies [3731d07]
+  - @framekore/core@0.0.14
+
 ## 0.0.13
 
 ### Patch Changes

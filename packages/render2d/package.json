@@ -1,6 +1,6 @@
 {
   "name": "@framekore/render2d",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "type": "module",
   "description": "pacote de renderização 2d da engine",
   "files": [
