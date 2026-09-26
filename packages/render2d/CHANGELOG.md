@@ -1,5 +1,12 @@
 # @framekore/render2d
 
+## 0.0.16
+
+### Patch Changes
+
+- 747e901: export animate2D
+- 0dad6e3: animate2D
+
 ## 0.0.15
 
 ### Patch Changes
