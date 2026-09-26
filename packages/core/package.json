@@ -1,6 +1,6 @@
 {
   "name": "@framekore/core",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "type": "module",
   "description": "core da engine",
   "files": [
