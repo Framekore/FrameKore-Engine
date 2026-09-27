@@ -1,5 +1,11 @@
 # @framekore/core
 
+## 0.0.15
+
+### Patch Changes
+
+- 2f01f10: animator2D
+
 ## 0.0.14
 
 ### Patch Changes

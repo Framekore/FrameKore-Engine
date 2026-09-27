@@ -1,5 +1,13 @@
 # @framekore/asset-manager
 
+## 0.0.15
+
+### Patch Changes
+
+- 2f01f10: animator2D
+- Updated dependencies [2f01f10]
+  - @framekore/core@0.0.15
+
 ## 0.0.14
 
 ### Patch Changes

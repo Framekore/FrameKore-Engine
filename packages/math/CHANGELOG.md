@@ -1,5 +1,11 @@
 # @framekore/math
 
+## 0.0.11
+
+### Patch Changes
+
+- 2f01f10: animator2D
+
 ## 0.0.10
 
 ### Patch Changes

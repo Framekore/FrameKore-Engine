@@ -1,5 +1,15 @@
 # @framekore/render2d
 
+## 0.0.17
+
+### Patch Changes
+
+- 2f01f10: animator2D
+- Updated dependencies [2f01f10]
+  - @framekore/core@0.0.15
+  - @framekore/math@0.0.11
+  - @framekore/transform2d@0.0.15
+
 ## 0.0.16
 
 ### Patch Changes
