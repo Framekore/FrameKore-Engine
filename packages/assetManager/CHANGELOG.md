@@ -1,5 +1,12 @@
 # @framekore/asset-manager
 
+## 0.0.16
+
+### Patch Changes
+
+- Updated dependencies [0ecd117]
+  - @framekore/core@0.0.16
+
 ## 0.0.15
 
 ### Patch Changes

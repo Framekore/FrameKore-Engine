@@ -1,5 +1,11 @@
 # @framekore/core
 
+## 0.0.16
+
+### Patch Changes
+
+- 0ecd117: build
+
 ## 0.0.15
 
 ### Patch Changes
