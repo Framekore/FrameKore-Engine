@@ -14,6 +14,11 @@
   },
   "dependencies": {
     "@framekore/core": "workspace:*",
-    "@framekore/input-manager": "workspace:*"
+    "@framekore/math": "workspace:*",
+    "@framekore/input-manager": "workspace:*",
+    "@framekore/render2d": "workspace:*",
+    "@framekore/asset-manager": "workspace:*",
+    "@framekore/physics2d": "workspace:*",
+    "@framekore/transform2d": "workspace:*"
   }
 }

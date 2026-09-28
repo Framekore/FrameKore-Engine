@@ -1,4 +1,3 @@
-import { Component } from "@framekore/core";
 import type { Frame, Texture } from "./texture";
 import { Vector2 } from "@framekore/math";
 import { Renderable2D } from "./renderable2D";
@@ -112,11 +111,11 @@ export class Sprite2D extends Renderable2D {
      * @param ctx - Target CanvasRenderingContext2D instance.
      */
     override render(ctx: CanvasRenderingContext2D): void {
+        
         if (!this.visible || this.alpha <= 0 || !this.texture || !this.gameObject) return;
 
         const transform = this.gameObject.getComponent(Transform2D);
         if (!transform) return;
-
         const srcX = this.frame?.x ?? 0;
         const srcY = this.frame?.y ?? 0;
         const srcW = this.frame?.width ?? this.texture.width;
@@ -129,7 +128,8 @@ export class Sprite2D extends Renderable2D {
         ctx.imageSmoothingEnabled = false;
 
         ctx.globalAlpha *= Math.max(0, Math.min(1, this.alpha));
-
+        ctx.scale(1, 1);
+        
         ctx.translate(
             Math.round(transform.position.x),
             Math.round(transform.position.y)
@@ -137,10 +137,7 @@ export class Sprite2D extends Renderable2D {
 
         ctx.rotate(transform.rotation);
 
-        const scaleX = transform.scale.x * (this.flipX ? -1 : 1);
-        const scaleY = transform.scale.y * (this.flipY ? -1 : 1);
-        ctx.scale(scaleX, scaleY);
-
+        
         ctx.drawImage(
             this.texture.image,
             Math.round(srcX),
@@ -152,7 +149,7 @@ export class Sprite2D extends Renderable2D {
             srcW,
             srcH
         );
-
+        
         ctx.restore();
     }
 }

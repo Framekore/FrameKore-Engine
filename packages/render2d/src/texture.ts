@@ -9,7 +9,7 @@ export type Frame = {
     /** Width of the frame in pixels. */
     width: number, 
     /** Height of the frame in pixels. */
-    height: number 
+    height: number
 }
 
 /**

@@ -321,24 +321,13 @@ export class RenderManager2D {
 
         this.ctx.save();
 
-        this.ctx.translate(transform.position.x, transform.position.y);
-        this.ctx.rotate(transform.rotation);
-        this.ctx.scale(transform.scale.x, transform.scale.y);
-
-        // Calcula o offset com base no anchor (pivô) do Sprite
-        const offsetX = -f.width * sprite.anchor.x;
-        const offsetY = -f.height * sprite.anchor.y;
-
-        this.ctx.drawImage(
-            sprite.texture.image,
-            f.x, f.y, f.width, f.height,
-            offsetX, offsetY, f.width, f.height
-        );
+        sprite.render(this.ctx)
 
         this.ctx.restore();
     }
 
     #renderObjects(obj: GameObject) {
+        
         const transform = obj.getComponent<TransformLike>(TRANSFORM_2D)
         const sprite = obj.getComponent<Sprite2D>(SPRITE_2D)
 
@@ -353,6 +342,7 @@ export class RenderManager2D {
      * @param delta - Time delta.
      */
     render(scene?: Scene, delta: number = 1 / 60): void {
+        
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
         if (!scene) return
 

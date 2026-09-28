@@ -12,6 +12,7 @@ export class AnimatedSprite2D extends Sprite2D {
     #currentFrame = 0;
     /** @internal Accumulated time since the last frame swap. */
     #elapsed = 0;
+    
 
     /** 
      * Animation playback speed in Frames Per Second. 
@@ -25,7 +26,7 @@ export class AnimatedSprite2D extends Sprite2D {
      * Determines whether the animation is currently progressing.
      * If false, the animation stays on the current frame.
      */
-    #playing = true;
+    #playing = false;
 
     /** Determines whether the animation loops when reaching the last frame. */
     loop = true
@@ -63,7 +64,7 @@ export class AnimatedSprite2D extends Sprite2D {
      * Starts or resumes the animation playback.
      * @example animatedSprite.play();
     */
-   play(): void {
+    play(): void {
        this.#playing = true;
     }
 
@@ -71,7 +72,7 @@ export class AnimatedSprite2D extends Sprite2D {
      * Pauses the animation on its current frame.
      * @example animatedSprite.stop();
     */
-   stop(): void {
+    stop(): void {
        this.#playing = false;
     }
 

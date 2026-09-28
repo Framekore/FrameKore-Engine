@@ -1,6 +1,5 @@
-import { GameObject } from "@framekore/core";
-import { AnimatedSprite2D } from "./animatedSprite2D";
-import { Renderable2D } from "./renderable2D";
+import { AnimatedSprite2D, Renderable2D } from "@framekore/render2d";
+
 
 /**
  * State machine component that manages multiple `AnimatedSprite2D` instances.
@@ -51,12 +50,13 @@ export class Animator2D extends Renderable2D {
      */
     play(name: string, restartOnSame: boolean = false): void {
         if (this.#currentName === name && !restartOnSame) return;
-
+        
         const nextAnimation = this.#animations.get(name);
         if (!nextAnimation) {
             console.warn(`Animator2D: Animation "${name}" was not found.`);
             return;
         }
+        console.log(nextAnimation, name);
         
         this.#currentName = name;
         nextAnimation.gameObject = this.gameObject;
