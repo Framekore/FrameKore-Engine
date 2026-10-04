@@ -1,5 +1,13 @@
 # @framekore/transform2d
 
+## 1.0.0
+
+### Patch Changes
+
+- 9b84f40: remove componetSystem
+- Updated dependencies [9b84f40]
+  - @framekore/core@0.1.0
+
 ## 0.0.16
 
 ### Patch Changes

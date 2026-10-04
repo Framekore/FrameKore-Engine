@@ -1,5 +1,17 @@
 # @framekore/render2d
 
+## 1.0.0
+
+### Minor Changes
+
+- 9b84f40: remove componetSystem
+
+### Patch Changes
+
+- Updated dependencies [9b84f40]
+  - @framekore/core@0.1.0
+  - @framekore/transform2d@1.0.0
+
 ## 0.0.18
 
 ### Patch Changes
