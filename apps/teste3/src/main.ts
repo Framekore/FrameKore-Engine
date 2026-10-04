@@ -19,3 +19,9 @@ const engine = new Engine()
 
 engine.setScene(new Cena(engine))
 engine.start()
+
+document.addEventListener('keypress', (e)=>{
+    if (e.code === "KeyP") {
+        engine.paused = !engine.paused
+    }
+})

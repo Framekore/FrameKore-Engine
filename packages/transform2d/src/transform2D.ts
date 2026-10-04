@@ -1,16 +1,11 @@
-import { Component } from "@framekore/core"
 import { Vector2 } from "@framekore/math"
-import { ITransform2D, TRANSFORM_2D } from "./contract"
+import { ITransform2D } from "./contract"
 
 /**
  * Component responsible for the position, scale, and rotation of a GameObject in 2D space.
  * Virtually all visible objects will need this component.
  */
-export class Transform2D extends Component implements ITransform2D {
-    /** 
-     * Unique symbol key identifying this component. 
-     */
-    static key = TRANSFORM_2D
+export class Transform2D implements ITransform2D {
     
     /**
      * The position of the GameObject in 2D space (x, y coordinates).

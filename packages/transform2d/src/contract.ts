@@ -5,5 +5,3 @@ export interface ITransform2D {
     rotation: number
     scale: Vector2
 }
-
-export const TRANSFORM_2D = Symbol("transform2d")

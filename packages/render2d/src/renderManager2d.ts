@@ -1,23 +1,16 @@
-import { type Component, definePlugin, Engine, type GameObject, type Scene, type TickerDisposer } from "@framekore/core";
-import { type ITransform2D, TRANSFORM_2D } from "@framekore/transform2d";
+import { definePlugin, Engine, type GameObject, type Scene, type TickerDisposer } from "@framekore/core";
+import { type ITransform2D } from "@framekore/transform2d";
 
 import { Camera2D } from "./camera2d";
-import { Sprite2D, SPRITE_2D } from "./sprite2D";
+import { Sprite2D } from "./sprite2D";
 import { Texture } from "./texture";
+import { Renderable2D } from "./renderable2D";
+// import { hasCamera2D, hasSprite2D } from ".";
 
-type TransformLike = Component & ITransform2D
+type TransformLike = ITransform2D
 
 const sprites = new WeakMap<Engine, Set<Sprite2D>>()
 
-/**
- * Creates a Render2D plugin for the Engine.
- * Must be initialized with a target HTMLCanvasElement.
- * @param canvas - The HTMLCanvasElement where the engine will draw.
- * @returns An EnginePlugin definition to be passed to `engine.use()`.
- * @example
- * const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
- * engine.use(render2d(canvas));
- */
 export const render2d = definePlugin((canvas: HTMLCanvasElement) => {
     let renderDisposer: TickerDisposer | undefined
     return {
@@ -27,35 +20,15 @@ export const render2d = definePlugin((canvas: HTMLCanvasElement) => {
             const manager = new RenderManager2D(canvas)
             engine.setResource(RenderManager2D, manager)
         },
-        onComponentAdded(component) {
-            const gameObject = component.gameObject
-            if (!gameObject || !gameObject.engine) return
-
-            if (component instanceof Sprite2D) {
-                sprites.get(gameObject.engine)?.add(component)
-            }
-        },
-        onComponentRemoved(component) {
-            const gameObject = component.gameObject
-            if (!gameObject || !gameObject.engine) return
-
-            if (component instanceof Sprite2D) {
-                sprites.get(gameObject.engine)?.delete(component)
-            }
-        },
         render(scene, delta) {
             const manager = RenderManager2D.getFromScene(scene);
             manager.render(scene, delta);
-
         },
         destroy() {
             renderDisposer?.dispose()
         }
     }
 })
-
-
-
 
 /**
  * Manages all 2D rendering operations on the canvas.
@@ -85,26 +58,14 @@ export class RenderManager2D {
         ctx.imageSmoothingEnabled = this.antialiasing
     }
 
-    /** 
-     * Enables or disables antialiasing (image smoothing). 
-     * Set to false for pixel art games.
-     */
     set antialiasing(value: boolean) {
         this.#antialiasing = value
         this.ctx.imageSmoothingEnabled = value
     }
 
-    /** Gets the current antialiasing state. */
     get antialiasing(): boolean {
         return this.#antialiasing;
     }
-
-    /**
-     * Retrieves the active RenderManager2D instance from an Engine.
-     * @param engine - The Engine instance.
-     * @returns The RenderManager2D instance.
-     * @throws If the render manager is not registered in the engine.
-     */
     static get(engine: Engine): RenderManager2D {
         const render = engine.getResource(RenderManager2D)
         if (!render)
@@ -112,15 +73,6 @@ export class RenderManager2D {
         return render
     }
 
-    /**
-     * Creates a new Texture from a specific region of the current canvas.
-     * Useful for capturing screenshots or dynamic textures.
-     * @param x - Start X coordinate.
-     * @param y - Start Y coordinate.
-     * @param w - Width of the region.
-     * @param h - Height of the region.
-     * @returns A new Texture object.
-     */
     getCanvasImage(x: number, y: number, w: number, h: number): Texture {
         const newCanvas = document.createElement('canvas')
         newCanvas.width = w
@@ -132,11 +84,6 @@ export class RenderManager2D {
         return new Texture(newCanvas)
     }
 
-    /**
-     * Retrieves the active RenderManager2D from a Scene's engine.
-     * @param scene - The Scene instance.
-     * @returns The RenderManager2D instance.
-     */
     static getFromScene(scene: Scene): RenderManager2D {
         return this.get(scene.engine);
     }
@@ -146,10 +93,11 @@ export class RenderManager2D {
         transform: TransformLike
     } | null {
         for (const obj of scene.getObjects()) {
-            const camera = obj.getComponent(Camera2D)
+            // const camera = hasCamera2D(obj) ? obj.camera : null
+            const camera = obj instanceof Camera2D ? obj : null
             if (!camera || !camera.isMain) continue
 
-            const transform = obj.getComponent<TransformLike>(TRANSFORM_2D)
+            const transform = (camera as any).transform2d
             if (!transform) continue
 
             return { camera, transform }
@@ -168,7 +116,7 @@ export class RenderManager2D {
     #updateCamera(camera: Camera2D, transform: TransformLike, delta: number) {
         if (!camera.target)
             return
-        const targetTransform = camera.target.getComponent<TransformLike>(TRANSFORM_2D)
+        const targetTransform = (camera.target as any).transform2d
         if (!targetTransform)
             return
         const targetX = targetTransform.position.x + camera.offset.x
@@ -251,36 +199,14 @@ export class RenderManager2D {
         }
     }
 
-    /**
-     * Helper to create a new Texture from an image or canvas.
-     * @param image - The source element.
-     * @returns A new Texture instance.
-     */
     createTexture(image: HTMLImageElement | HTMLCanvasElement): Texture {
         return new Texture(image)
     }
 
-    /**
-     * Enqueues a custom drawing operation to be executed in the world space (affected by camera).
-     * @param callback - A function that receives the 2D context to perform custom drawing.
-     * @example
-     * renderManager.draw((ctx) => {
-     *   ctx.fillStyle = "red";
-     *   ctx.fillRect(0, 0, 100, 100);
-     * });
-     */
     draw(callback: (ctx: CanvasRenderingContext2D) => void): void {
         this.#drawQueue.push(callback)
     }
 
-    /**
-     * Enqueues a custom drawing operation to be executed in screen space (unaffected by camera, e.g., UI).
-     * @param callback - A function that receives the 2D context.
-     * @example
-     * renderManager.drawScreen((ctx) => {
-     *   ctx.fillText("Score: 100", 10, 20);
-     * });
-     */
     drawScreen(callback: (ctx: CanvasRenderingContext2D) => void): void {
         this.#screenDrawQueue.push(callback)
     }
@@ -299,23 +225,6 @@ export class RenderManager2D {
         this.#screenDrawQueue.length = 0
     }
 
-    // #renderSprite(transform: ITransform2D, sprite: Sprite2D) {
-    //     const f = sprite.frame!
-
-    //     this.ctx.save()
-
-    //     this.ctx.translate(transform.position.x, transform.position.y)
-    //     this.ctx.rotate(transform.rotation)
-    //     this.ctx.scale(transform.scale.x, transform.scale.y)
-
-    //     this.ctx.drawImage(
-    //         sprite.texture.image,
-    //         f.x, f.y, f.width, f.height,
-    //         -f.width / 2, -f.height / 2, f.width, f.height
-    //     )
-    //     this.ctx.restore()
-    // }
-
     #renderSprite(transform: ITransform2D, sprite: Sprite2D) {
         const f = sprite.frame!;
 
@@ -327,22 +236,20 @@ export class RenderManager2D {
     }
 
     #renderObjects(obj: GameObject) {
-        
-        const transform = obj.getComponent<TransformLike>(TRANSFORM_2D)
-        const sprite = obj.getComponent<Sprite2D>(SPRITE_2D)
+        // OLD: depended on hasSprite2D to detect renderables
+        // const transform = hasTransform2D(obj) ? obj.transform2d : null
+        // const sprite = hasSprite2D(obj) ? obj.sprite : null
+        // if (!transform || !sprite || !sprite.frame) return
+        // this.#renderSprite(transform, sprite)
 
-        if (!transform || !sprite || !sprite.frame) return
-
-        this.#renderSprite(transform, sprite)
+        // NEW: qualquer Renderable2D na cena é renderizado automaticamente
+        if (obj instanceof Renderable2D) {
+            obj.render(this.ctx)
+        }
     }
 
-    /**
-     * @internal Called automatically by the engine to render the scene.
-     * @param scene - The current scene.
-     * @param delta - Time delta.
-     */
     render(scene?: Scene, delta: number = 1 / 60): void {
-        
+
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
         if (!scene) return
 

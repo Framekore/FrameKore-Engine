@@ -1,8 +1,7 @@
 import { Vector2 } from "@framekore/math";
-import { Component } from "@framekore/core";
 import { Transform2D } from "@framekore/transform2d";
-
-export const BOX_COLLIDE_2D = Symbol("boxCollide2d");
+import { Component } from "./component";
+import { GameObject } from "@framekore/core";
 
 /**
  * Bitmask flags representing distinct collision layers.
@@ -29,11 +28,6 @@ export type CollisionLayer = number
  * It's required for objects to interact physically or trigger collision events.
  */
 export class BoxCollide2D extends Component {
-    /** 
-     * Unique symbol key identifying this component. 
-     */
-    static key = BOX_COLLIDE_2D
-
     /** Width of the collision box. */
     width: number
     /** Height of the collision box. */
@@ -69,12 +63,12 @@ export class BoxCollide2D extends Component {
      *   mask: CollisionLayer.Layer2
      * });
      */
-    constructor(width: number, height: number, options: {
+    constructor(object: GameObject, width: number, height: number, options: {
         isTrigger?: boolean
         layer?: CollisionLayer
         mask?: CollisionLayer
     } = {}) {
-        super()
+        super(object)
         this.width = width
         this.height = height
         this.isTrigger = options.isTrigger ?? false

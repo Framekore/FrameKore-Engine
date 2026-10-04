@@ -11,7 +11,7 @@ export class Cena extends Scene {
     render: RenderManager2D
 
     constructor(engine: Engine) {
-        super()
+        super(engine)
         this.engine = engine
         this.player = new Player(engine, {
             position: new Vector2(300, 300),
@@ -21,12 +21,24 @@ export class Cena extends Scene {
         this.add(this.player)
 
         const col1 = new Collision(engine, {
-            position: new Vector2(200, 400),
-            width: 200,
+            position: new Vector2(400, 400),
+            width: 400,
             height: 32
         })
-        this.collisions.push(col1, this.player)
+        const col2 = new Collision(engine, {
+            position: new Vector2(300, 400-32),
+            width: 32,
+            height: 32
+        })
+        const col3 = new Collision(engine, {
+            position: new Vector2(400, 400-(64+20)),
+            width: 32,
+            height: 32
+        })
+        this.collisions.push(col1, col2, col3, this.player)
         this.add(col1)
+        this.add(col2)
+        this.add(col3)
         this.render = RenderManager2D.get(engine)
     }
 
@@ -35,11 +47,11 @@ export class Cena extends Scene {
         this.render.draw((ctx) => {
             ctx.fillStyle = '#000'
             for(const col of this.collisions) {
-                ctx.fillRect(
-                    col.transform.position.x,
-                    col.transform.position.y,
-                    col.collision.width,
-                    col.collision.height
+                ctx.strokeRect(
+                    col.transform2d.position.x - (col.boxCollide2D.width)/2,
+                    col.transform2d.position.y - (col.boxCollide2D.height)/2,
+                    col.boxCollide2D.width,
+                    col.boxCollide2D.height
                 )
             }
         })

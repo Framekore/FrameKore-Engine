@@ -1,18 +1,10 @@
 import { Vector2 } from "@framekore/math"
-import { Component } from "@framekore/core"
-
-export const RIGID_BODY_2D = Symbol("rigidBody2d");
-
+import { Component } from "./component"
 /**
  * Component that adds physical behavior to a GameObject, allowing it to be affected by gravity and forces.
  * Works in conjunction with the Physics2D manager and BoxCollide2D for collision resolution.
  */
 export class RigidBody2D extends Component {
-    /** 
-     * Unique symbol key identifying this component. 
-     */
-    static key = RIGID_BODY_2D
-    
     /**
      * The current velocity vector of the rigid body.
      */

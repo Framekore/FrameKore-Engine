@@ -1,5 +1,4 @@
 export * from "./utils/priorityQueue"
-export * from "./utils/component"
 export * from "./utils/ticker"
 export * from "./engine"
 export * from "./gameObject"

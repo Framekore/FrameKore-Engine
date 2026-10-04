@@ -10,26 +10,24 @@ export interface CollisionOptions {
 }
 
 export class Collision extends GameObject {
-    transform: Transform2D
-    collision: BoxCollide2D
+    boxCollide2D: BoxCollide2D;
+    transform2d: Transform2D;
+
     constructor(engine: Engine, options: CollisionOptions) {
-        super()
+        super(engine)
         this.engine = engine
 
         const width = options.width ?? 32
         const height = options.height ?? 32
 
-        this.transform = new Transform2D()
-        this.addComponent(this.transform)
-        this.transform.position = options.position
+        this.transform2d = new Transform2D()
+        
+        this.transform2d.position = options.position
 
-        this.collision = new BoxCollide2D(width, height, {
+        this.boxCollide2D = new BoxCollide2D(this, width, height, {
             layer: CollisionLayer.Layer1,
             mask: CollisionLayer.Layer2 | CollisionLayer.Layer1
         })
-        this.collision.setOrigin(0, 0)
-
-        this.addComponent(this.collision)
-
+        this.boxCollide2D.setOrigin(.5, .5)
     }
 }

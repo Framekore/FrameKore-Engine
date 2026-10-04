@@ -1,4 +1,3 @@
-import type { Component } from "./utils/component"
 import { Priority, Ticker } from "./utils/ticker"
 import type { Scene } from "./scene"
 
@@ -38,17 +37,6 @@ export interface EnginePlugin {
      * @param delta - The fixed time step.
      */
     fixedUpdate?(engine: Engine, delta: number): void
-
-    /**
-     * Called when a component is added to any GameObject in the engine.
-     * @param component - The component that was added.
-     */
-    onComponentAdded?(component: Component): void
-    /**
-     * Called when a component is removed from any GameObject in the engine.
-     * @param component - The component that was removed.
-     */
-    onComponentRemoved?(component: Component): void
 }
 
 /**
@@ -69,7 +57,6 @@ export interface IDebuggable {
     }
 }
 
-export type ComponentCallback = (component: Component) => void;
 export type RenderCallback = () => void;
 
 /**
@@ -81,9 +68,9 @@ export class Engine {
     #currentScene?: Scene
     #plugins = new Map<string, EnginePlugin>()
     #resources = new Map<any, any>()
-    #componentAddedListeners = new Set<ComponentCallback>();
-    #componentRemovedListeners = new Set<ComponentCallback>();
     #renderListeners = new Set<RenderCallback>();
+
+    paused: boolean = false
 
     constructor() {
         this.#ticker = new Ticker()
@@ -128,6 +115,7 @@ export class Engine {
     // Engine
 
     #update = (delta: number) => {
+        if (this.paused) return
         this.#currentScene?.update(delta)
         for (const plugin of this.#plugins.values()) {
             plugin.update?.(this, delta)
@@ -135,6 +123,7 @@ export class Engine {
     }
 
     #fixedUpdate = (delta: number) => {
+        if (this.paused) return
         this.#currentScene?.fixedUpdate?.(delta)
 
         for (const plugin of this.#plugins.values()) {
@@ -226,26 +215,6 @@ export class Engine {
     }
 
     /**
-     * Subscribes a listener to be executed when any component is added to a GameObject.
-     * @param listener - Callback function receiving the added Component.
-     * @returns Cleanup function to unsubscribe the listener.
-     */
-    onComponentAdded(listener: ComponentCallback): () => void {
-        this.#componentAddedListeners.add(listener);
-        return () => this.#componentAddedListeners.delete(listener);
-    }
-
-    /**
-     * Subscribes a listener to be executed when any component is removed from a GameObject.
-     * @param listener - Callback function receiving the removed Component.
-     * @returns Cleanup function to unsubscribe the listener.
-     */
-    onComponentRemoved(listener: ComponentCallback): () => void {
-        this.#componentRemovedListeners.add(listener);
-        return () => this.#componentRemovedListeners.delete(listener);
-    }
-
-    /**
      * Subscribes a listener to be executed during the render phase of the engine loop.
      * @param listener - Callback function executed during render step.
      * @returns Cleanup function to unsubscribe the listener.
@@ -253,34 +222,6 @@ export class Engine {
     onRender(listener: RenderCallback): () => void {
         this.#renderListeners.add(listener);
         return () => this.#renderListeners.delete(listener);
-    }
-
-    /**
-     * Notifies engine listeners and plugins that a new component has been added.
-     * Typically called internally by GameObjects.
-     * @param component - The added component.
-     */
-    notifyComponentAdded(component: Component): void {
-        for (const listener of this.#componentAddedListeners) {
-            listener(component)
-        }
-        for (const plugin of this.#plugins.values()) {
-            plugin.onComponentAdded?.(component)
-        }
-    }
-
-    /**
-     * Notifies engine listeners and plugins that a component has been removed.
-     * Typically called internally by GameObjects.
-     * @param component - The removed component.
-     */
-    notifyComponentRemoved(component: Component): void {
-        for (const listener of this.#componentRemovedListeners) {
-            listener(component)
-        }
-        for (const plugin of this.#plugins.values()) {
-            plugin.onComponentRemoved?.(component)
-        }
     }
 
 }

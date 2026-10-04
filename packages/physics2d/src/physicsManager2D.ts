@@ -1,15 +1,19 @@
 import { definePlugin, Engine } from "@framekore/core";
 import type { GameObject } from "@framekore/core";
-import type { Component } from "@framekore/core";
 import { Vector2 } from "@framekore/math";
-import { TRANSFORM_2D, type ITransform2D } from "@framekore/transform2d";
-import { BOX_COLLIDE_2D, BoxCollide2D } from "./boxCollide2D";
-import { RIGID_BODY_2D, RigidBody2D } from "./RigidBody2D";
+import type { Transform2D } from "@framekore/transform2d";
+import { BoxCollide2D } from "./boxCollide2D";
+import { RigidBody2D } from "./RigidBody2D";
+// import { hasBoxCollider, hasRigidBody } from ".";
 
-type TransformLike = Component & ITransform2D
+interface PhysicsObject extends GameObject {
+    transform2d?: Transform2D;
+    boxCollide2D?: BoxCollide2D;
+    rigidBody2d?: RigidBody2D;
+}
 
-const rigidBodies = new WeakMap<Engine, Set<RigidBody2D>>();
-const boxColliders = new WeakMap<Engine, Set<BoxCollide2D>>();
+// O sistema antigo dependia de WeakMaps que eram preenchidos por eventos do ECS.
+// Agora vamos varrer a cena dinamicamente (como o RenderManager2D faz).
 
 /**
  * Creates the Physics2D plugin for the Engine.
@@ -22,8 +26,8 @@ export const physics2d = definePlugin(() => {
   return {
     name: "physics",
     setup(engine) {
-      rigidBodies.set(engine, new Set());
-      boxColliders.set(engine, new Set());
+      // Removemos o setup inicial dos WeakMaps
+
       const physics = new Physics2D(engine);
       engine.setResource(Physics2D, physics);
     },
@@ -33,28 +37,7 @@ export const physics2d = definePlugin(() => {
         return
       physics.step(delta)
     },
-    onComponentAdded(component) {
-      const gameObject = component.gameObject;
-      if (!gameObject || !gameObject.engine)
-        return
-      if (component instanceof RigidBody2D) {
-        rigidBodies.get(gameObject.engine)?.add(component);
-      }
-      if (component instanceof BoxCollide2D) {
-        boxColliders.get(gameObject.engine)?.add(component);
-      }
-    },
-    onComponentRemoved(component) {
-      const gameObject = component.gameObject;
-      if (!gameObject || !gameObject.engine)
-        return
-      if (component instanceof RigidBody2D) {
-        rigidBodies.get(gameObject.engine)?.delete(component);
-      }
-      if (component instanceof BoxCollide2D) {
-        boxColliders.get(gameObject.engine)?.delete(component);
-      }
-    },
+    
   };
 });
 
@@ -90,16 +73,17 @@ export class Physics2D {
    * }
    */
   checkCollision(a: GameObject, b: GameObject): boolean {
-    const transformA = a.getComponent<TransformLike>(TRANSFORM_2D);
-    const boxA = a.getComponent<BoxCollide2D>(BOX_COLLIDE_2D);
-    const transformB = b.getComponent<TransformLike>(TRANSFORM_2D);
-    const boxB = b.getComponent<BoxCollide2D>(BOX_COLLIDE_2D);
+    const transformA = (a as PhysicsObject).transform2d;
+    const boxA = (a as PhysicsObject).boxCollide2D;
+    const transformB = (b as PhysicsObject).transform2d;
+    const boxB = (b as PhysicsObject).boxCollide2D;
 
-    if (!boxA || !boxB || !transformA || !transformB)
+    if (!boxA || !boxB || !transformA || !transformB) {
       throw new Error(
         "Objects must have 'Transform2D' and 'BoxCollide2D' components to check collisions.",
       );
-
+    }
+    
     const boundA = boxA.getBounds(transformA);
     const boundB = boxB.getBounds(transformB);
 
@@ -131,10 +115,10 @@ export class Physics2D {
    * @param object2 - The second GameObject.
    */
   resolveCollision(object1: GameObject, object2: GameObject): void {
-    const transformA = object1.getComponent<TransformLike>(TRANSFORM_2D);
-    const boxA = object1.getComponent<BoxCollide2D>(BOX_COLLIDE_2D);
-    const transformB = object2.getComponent<TransformLike>(TRANSFORM_2D);
-    const boxB = object2.getComponent<BoxCollide2D>(BOX_COLLIDE_2D);
+    const transformA = (object1 as PhysicsObject).transform2d;
+    const boxA = (object1 as PhysicsObject).boxCollide2D;
+    const transformB = (object2 as PhysicsObject).transform2d;
+    const boxB = (object2 as PhysicsObject).boxCollide2D;
 
     if (!boxA || !boxB || !transformA || !transformB)
       throw new Error(
@@ -160,8 +144,8 @@ export class Physics2D {
       const overlapX = combinedHalfWidths - Math.abs(dx);
       const overlapY = combinedHalfHeights - Math.abs(dy);
 
-      const rbA = object1.getComponent<RigidBody2D>(RIGID_BODY_2D);
-      const rbB = object2.getComponent<RigidBody2D>(RIGID_BODY_2D);
+      const rbA = (object1 as PhysicsObject).rigidBody2d;
+      const rbB = (object2 as PhysicsObject).rigidBody2d;
       if (rbA && rbB) {
         if (overlapX < overlapY) {
           if (dx > 0) {
@@ -253,14 +237,26 @@ export class Physics2D {
    * @param delta - The fixed time step.
    */
   step(delta: number): void {
-    const rbSet = rigidBodies.get(this.#engine);
-    const colSet = boxColliders.get(this.#engine);
-    if (!rbSet || !colSet) return;
-    
+    const scene = this.#engine.currentScene;
+    if (!scene) return;
+
+    const objects = scene.getObjects();
+    const rbSet = new Set<RigidBody2D>();
+    const colSet = new Set<BoxCollide2D>();
+
+    // Coleta todos os corpos rígidos e colisores da cena atual
+    for (const obj of objects) {
+      const rb = (obj as PhysicsObject).rigidBody2d;
+      const col = (obj as PhysicsObject).boxCollide2D;
+      
+      if (rb) rbSet.add(rb);
+      if (col) colSet.add(col);
+    }
+
     for (const collider of colSet) {
       collider.colliding = false
     }
-    
+
     for (const rb of rbSet) {
       rb.touching.top = false
       rb.touching.bottom = false
@@ -268,7 +264,7 @@ export class Physics2D {
       rb.touching.right = false
       if (!rb.gameObject)
         continue
-      const transform = rb.gameObject.getComponent<TransformLike>(TRANSFORM_2D);
+      const transform = (rb.gameObject as PhysicsObject).transform2d;
       if (!transform)
         continue;
 
@@ -291,8 +287,8 @@ export class Physics2D {
     const objA = rb.gameObject
     if (!objA)
       return
-    const transformA = objA.getComponent<TransformLike>(TRANSFORM_2D)
-    const boxA = objA.getComponent<BoxCollide2D>(BOX_COLLIDE_2D)
+    const transformA = (objA as PhysicsObject).transform2d;
+    const boxA = (objA as PhysicsObject).boxCollide2D;
 
     if (!transformA || !boxA)
       return
@@ -301,8 +297,8 @@ export class Physics2D {
       const objB = collider.gameObject
       if (!objB || objA === objB) continue
 
-      const transformB = objB.getComponent<TransformLike>(TRANSFORM_2D)
-      const boxB = objB.getComponent<BoxCollide2D>(BOX_COLLIDE_2D)
+      const transformB = (objB as PhysicsObject).transform2d;
+      const boxB = (objB as PhysicsObject).boxCollide2D;
       if (!transformB || !boxB) continue
       if (!this.canCollide(boxA, boxB)) continue
       if (!this.checkCollision(objA, objB)) continue
@@ -338,17 +334,19 @@ export class Physics2D {
   resolveCollisionsY(rb: RigidBody2D, colSet: Set<BoxCollide2D>): void {
     const objA = rb.gameObject
     if (!objA) return
+    
+    const transformA = (objA as PhysicsObject).transform2d;
+    const boxA = (objA as PhysicsObject).boxCollide2D;
 
-    const transformA = objA.getComponent<TransformLike>(TRANSFORM_2D)
-    const boxA = objA.getComponent<BoxCollide2D>(BOX_COLLIDE_2D)
     if (!transformA || !boxA) return
 
     for (const collider of colSet) {
       const objB = collider.gameObject
       if (!objB || objA === objB) continue
 
-      const transformB = objB.getComponent<TransformLike>(TRANSFORM_2D)
-      const boxB = objB.getComponent<BoxCollide2D>(BOX_COLLIDE_2D)
+      const transformB = (objB as PhysicsObject).transform2d;
+      const boxB = (objB as PhysicsObject).boxCollide2D;
+
       if (!transformB || !boxB) continue
       if (!this.canCollide(boxA, boxB)) continue
       if (!this.checkCollision(objA, objB)) continue

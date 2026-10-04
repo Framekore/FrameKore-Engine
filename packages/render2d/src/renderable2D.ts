@@ -1,6 +1,6 @@
-import { Component } from "@framekore/core";
+import { GameObject } from "@framekore/core";
 
-export abstract class Renderable2D extends Component {
+export abstract class Renderable2D extends GameObject {
   public visible: boolean = true;
   public zIndex: number = 0;
 

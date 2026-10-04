@@ -12,186 +12,6 @@ importers:
         specifier: ^2.31.0
         version: 2.31.0(@types/node@26.4.0)
 
-  apps/correndo-contra-o-eco:
-    dependencies:
-      '@framekore/asset-manager':
-        specifier: workspace:*
-        version: link:../../packages/assetManager
-      '@framekore/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@framekore/input-manager':
-        specifier: workspace:*
-        version: link:../../packages/inputManager
-      '@framekore/math':
-        specifier: workspace:*
-        version: link:../../packages/math
-      '@framekore/physics2d':
-        specifier: workspace:*
-        version: link:../../packages/physics2d
-      '@framekore/render2d':
-        specifier: workspace:*
-        version: link:../../packages/render2d
-      '@framekore/transform2d':
-        specifier: workspace:*
-        version: link:../../packages/transform2d
-    devDependencies:
-      typescript:
-        specifier: ~6.0.2
-        version: 6.0.3
-      vite:
-        specifier: ^8.0.12
-        version: 8.3.1(@types/node@26.4.0)(esbuild@0.27.7)
-
-  apps/plataform2d:
-    dependencies:
-      '@framekore/asset-manager':
-        specifier: workspace:*
-        version: link:../../packages/assetManager
-      '@framekore/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@framekore/input-manager':
-        specifier: workspace:*
-        version: link:../../packages/inputManager
-      '@framekore/math':
-        specifier: workspace:*
-        version: link:../../packages/math
-      '@framekore/physics2d':
-        specifier: workspace:*
-        version: link:../../packages/physics2d
-      '@framekore/render2d':
-        specifier: workspace:*
-        version: link:../../packages/render2d
-      '@framekore/transform2d':
-        specifier: workspace:*
-        version: link:../../packages/transform2d
-    devDependencies:
-      typescript:
-        specifier: ~5.9.3
-        version: 5.9.3
-      vite:
-        specifier: ^8.0.1
-        version: 8.3.1(@types/node@26.4.0)(esbuild@0.27.7)
-
-  apps/rpg:
-    dependencies:
-      '@framekore/asset-manager':
-        specifier: workspace:*
-        version: link:../../packages/assetManager
-      '@framekore/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@framekore/input-manager':
-        specifier: workspace:*
-        version: link:../../packages/inputManager
-      '@framekore/physics2d':
-        specifier: workspace:*
-        version: link:../../packages/physics2d
-      '@framekore/render2d':
-        specifier: workspace:*
-        version: link:../../packages/render2d
-    devDependencies:
-      typescript:
-        specifier: ~6.0.2
-        version: 6.0.3
-      vite:
-        specifier: ^8.0.10
-        version: 8.3.1(@types/node@26.4.0)(esbuild@0.27.7)
-
-  apps/test:
-    dependencies:
-      '@framekore/asset-manager':
-        specifier: workspace:*
-        version: link:../../packages/assetManager
-      '@framekore/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@framekore/input-manager':
-        specifier: workspace:*
-        version: link:../../packages/inputManager
-      '@framekore/math':
-        specifier: workspace:*
-        version: link:../../packages/math
-      '@framekore/physics2d':
-        specifier: workspace:*
-        version: link:../../packages/physics2d
-      '@framekore/render2d':
-        specifier: workspace:*
-        version: link:../../packages/render2d
-      '@framekore/transform2d':
-        specifier: workspace:*
-        version: link:../../packages/transform2d
-    devDependencies:
-      typescript:
-        specifier: ~6.0.2
-        version: 6.0.3
-      vite:
-        specifier: ^8.2.0
-        version: 8.3.1(@types/node@26.4.0)(esbuild@0.27.7)
-
-  apps/teste:
-    dependencies:
-      '@framekore/asset-manager':
-        specifier: workspace:*
-        version: link:../../packages/assetManager
-      '@framekore/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@framekore/input-manager':
-        specifier: workspace:*
-        version: link:../../packages/inputManager
-      '@framekore/math':
-        specifier: workspace:*
-        version: link:../../packages/math
-      '@framekore/physics2d':
-        specifier: workspace:*
-        version: link:../../packages/physics2d
-      '@framekore/render2d':
-        specifier: workspace:*
-        version: link:../../packages/render2d
-      '@framekore/transform2d':
-        specifier: workspace:*
-        version: link:../../packages/transform2d
-    devDependencies:
-      typescript:
-        specifier: ~6.0.2
-        version: 6.0.3
-      vite:
-        specifier: ^8.2.0
-        version: 8.3.1(@types/node@26.4.0)(esbuild@0.27.7)
-
-  apps/teste2:
-    dependencies:
-      '@framekore/asset-manager':
-        specifier: workspace:*
-        version: link:../../packages/assetManager
-      '@framekore/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@framekore/input-manager':
-        specifier: workspace:*
-        version: link:../../packages/inputManager
-      '@framekore/math':
-        specifier: workspace:*
-        version: link:../../packages/math
-      '@framekore/physics2d':
-        specifier: workspace:*
-        version: link:../../packages/physics2d
-      '@framekore/render2d':
-        specifier: workspace:*
-        version: link:../../packages/render2d
-      '@framekore/transform2d':
-        specifier: workspace:*
-        version: link:../../packages/transform2d
-    devDependencies:
-      typescript:
-        specifier: ~5.9.3
-        version: 5.9.3
-      vite:
-        specifier: ^8.0.1
-        version: 8.3.1(@types/node@26.4.0)(esbuild@0.27.7)
-
   apps/teste3:
     dependencies:
       '@framekore/asset-manager':
@@ -221,19 +41,6 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^8.0.1
-        version: 8.3.1(@types/node@26.4.0)(esbuild@0.27.7)
-
-  apps/teste4:
-    dependencies:
-      '@framekore/core':
-        specifier: ^0.0.10
-        version: 0.0.10
-    devDependencies:
-      typescript:
-        specifier: ~6.0.2
-        version: 6.0.3
-      vite:
-        specifier: ^8.2.0
         version: 8.3.1(@types/node@26.4.0)(esbuild@0.27.7)
 
   packages/assetManager:
@@ -603,9 +410,6 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
-
-  '@framekore/core@0.0.10':
-    resolution: {integrity: sha512-VkMtMOrlhL7UPZwU3906RbN+49azjwX2POGOEFpn8KGhLiK9lN+PaWQAGf/UJ6gPlJ/yYZiLnKynpHc7jXBQeA==}
 
   '@inquirer/external-editor@1.0.3':
     resolution: {integrity: sha512-RWbSrDiYmO4LbejWY7ttpxczuwQyZLBUyygsA9Nsv95hpzUWwnNTVQmAq3xuh7vNwCp07UTmE5i11XAEExx4RA==}
@@ -1707,11 +1511,6 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  typescript@6.0.3:
-    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   ufo@1.6.4:
     resolution: {integrity: sha512-JFNbkD1Svwe0KvGi8GOeLcP4kAWQ609twvCdcHxq1oSL8svv39ZuSvajcD8B+5D0eL4+s1Is2D/O6KN3qcTeRA==}
 
@@ -2046,8 +1845,6 @@ snapshots:
 
   '@esbuild/win32-x64@0.27.7':
     optional: true
-
-  '@framekore/core@0.0.10': {}
 
   '@inquirer/external-editor@1.0.3(@types/node@26.4.0)':
     dependencies:
@@ -2884,7 +2681,7 @@ snapshots:
       hookable: 6.1.1
       import-without-cache: 0.4.0
       obug: 2.1.2
-      picomatch: 4.0.4
+      picomatch: 4.0.7
       rolldown: 1.1.1
       rolldown-plugin-dts: 0.25.2(rolldown@1.1.1)(typescript@5.9.3)
       semver: 7.8.4
@@ -2932,8 +2729,6 @@ snapshots:
       - yaml
 
   typescript@5.9.3: {}
-
-  typescript@6.0.3: {}
 
   ufo@1.6.4: {}
 
