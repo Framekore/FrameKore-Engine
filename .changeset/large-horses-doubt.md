@@ -1,0 +1,5 @@
+---
+"@framekore/core": major
+---
+
+noComponents
