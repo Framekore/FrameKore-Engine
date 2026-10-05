@@ -2,7 +2,7 @@ import type { Frame, Texture } from "./texture";
 import { Vector2 } from "@framekore/math";
 import { Renderable2D } from "./renderable2D";
 import { Transform2D } from "@framekore/transform2d";
-import { Engine, GameObject } from "@framekore/core";
+import { Engine, GameObject, getComponentByType } from "@framekore/core";
 
 /**
  * Component used to render a static 2D image (sprite) from a texture.
@@ -46,9 +46,9 @@ export class Sprite2D extends Renderable2D {
         let transform
 
         if (this.target) {
-            transform = (this.target as any).transform2d;
+            transform = getComponentByType(this.target, Transform2D);
         } else {
-            transform = (this as any).transform2d;
+            transform = getComponentByType(this, Transform2D);
         }
         if (!transform) return;
         const srcX = this.frame?.x ?? 0;

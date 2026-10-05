@@ -48,10 +48,10 @@ export class Cena extends Scene {
             ctx.fillStyle = '#000'
             for(const col of this.collisions) {
                 ctx.strokeRect(
-                    col.transform2d.position.x - (col.boxCollide2D.width)/2,
-                    col.transform2d.position.y - (col.boxCollide2D.height)/2,
-                    col.boxCollide2D.width,
-                    col.boxCollide2D.height
+                    col.transform.position.x - (col.collision.width)/2,
+                    col.transform.position.y - (col.collision.height)/2,
+                    col.collision.width,
+                    col.collision.height
                 )
             }
         })

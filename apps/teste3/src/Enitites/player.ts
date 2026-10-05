@@ -7,7 +7,7 @@ import { AnimatedSprite2D, Animator2D, Renderable, Sprite2D, Texture } from "@fr
 import { InputManager } from "@framekore/input-manager";
 
 export class Player extends Collision implements Renderable {
-    rigidBody2d: RigidBody2D
+    body: RigidBody2D
     assets: AssetManager
     keys: InputManager
     animator: Animator2D;
@@ -34,7 +34,7 @@ export class Player extends Collision implements Renderable {
 
     constructor(engine: Engine, options: CollisionOptions) {
         super(engine, options)
-        this.rigidBody2d = new RigidBody2D(this)
+        this.body = new RigidBody2D(this)
 
         this.keys = InputManager.get(engine)
         this.assets = AssetManager.get(engine)
@@ -66,12 +66,12 @@ export class Player extends Collision implements Renderable {
         })
         this.addComponent(this.animator)
 
-        this.transform2d.scale.x = 1
-        this.transform2d.scale.y = 1
+        this.transform.scale.x = 1
+        this.transform.scale.y = 1
 
-        this.boxCollide2D.setOrigin(.5, .5)
-        this.boxCollide2D.layer = CollisionLayer.Layer2
-        this.boxCollide2D.mask = CollisionLayer.Layer1 | CollisionLayer.Layer2
+        this.collision.setOrigin(.5, .5)
+        this.collision.layer = CollisionLayer.Layer2
+        this.collision.mask = CollisionLayer.Layer1 | CollisionLayer.Layer2
         // this.body.useGravity = false
     }
     render(ctx: CanvasRenderingContext2D): void {
@@ -89,22 +89,22 @@ export class Player extends Collision implements Renderable {
         const hspd = (this.key.right - this.key.left) * this.SPEED
         if (hspd !== 0) {
             this.animator.play('run')
-            this.boxCollide2D.width = 37;
+            this.collision.width = 37;
             this.animator.flipX = Math.sign(hspd) > 0 ? false : true
         } else {
             this.animator.play('idle')
-            this.boxCollide2D.width = 25;
+            this.collision.width = 25;
         }
 
-        this.rigidBody2d.velocity.x = hspd
-        if (this.key.up && this.rigidBody2d.touching.bottom) {
+        this.body.velocity.x = hspd
+        if (this.key.up && this.body.touching.bottom) {
             this.#handleJump()
             this.key.jump = 0;
         }
     }
 
     #handleJump() {
-        this.rigidBody2d.applyForce(0, -this.JUMP_FORCE)
+        this.body.applyForce(0, -this.JUMP_FORCE)
     }
 
 }

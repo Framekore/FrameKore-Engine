@@ -1,5 +1,5 @@
-import { definePlugin, Engine, type GameObject, type Scene, type TickerDisposer } from "@framekore/core";
-import { type ITransform2D } from "@framekore/transform2d";
+import { definePlugin, Engine, getComponentByType, type GameObject, type Scene, type TickerDisposer } from "@framekore/core";
+import { Transform2D, type ITransform2D } from "@framekore/transform2d";
 
 import { Camera2D } from "./camera2d";
 import { Sprite2D } from "./sprite2D";
@@ -97,7 +97,7 @@ export class RenderManager2D {
             const camera = obj instanceof Camera2D ? obj : null
             if (!camera || !camera.isMain) continue
 
-            const transform = (camera as any).transform2d
+            const transform = getComponentByType(camera, Transform2D)
             if (!transform) continue
 
             return { camera, transform }
@@ -116,7 +116,7 @@ export class RenderManager2D {
     #updateCamera(camera: Camera2D, transform: TransformLike, delta: number) {
         if (!camera.target)
             return
-        const targetTransform = (camera.target as any).transform2d
+        const targetTransform = getComponentByType(camera.target, Transform2D)
         if (!targetTransform)
             return
         const targetX = targetTransform.position.x + camera.offset.x
@@ -225,15 +225,15 @@ export class RenderManager2D {
         this.#screenDrawQueue.length = 0
     }
 
-    #renderSprite(transform: ITransform2D, sprite: Sprite2D) {
-        const f = sprite.frame!;
+    // #renderSprite(transform: ITransform2D, sprite: Sprite2D) {
+    //     const f = sprite.frame!;
 
-        this.ctx.save();
+    //     this.ctx.save();
 
-        sprite.render(this.ctx)
+    //     sprite.render(this.ctx)
 
-        this.ctx.restore();
-    }
+    //     this.ctx.restore();
+    // }
 
     #renderObjects(obj: GameObject) {
         // OLD: depended on hasSprite2D to detect renderables

@@ -28,3 +28,7 @@ export abstract class GameObject {
     update?(delta: number): void
     fixedUpdate?(delta: number): void
 }
+
+export function getComponentByType<T>(obj: GameObject, constructor: new (...args: any[]) => T): T | undefined {
+    return Object.values(obj).find((val): val is T => val instanceof constructor);
+}
