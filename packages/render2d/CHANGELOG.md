@@ -1,5 +1,14 @@
 # @framekore/render2d
 
+## 2.0.0
+
+### Patch Changes
+
+- eb5aca7: correct
+- Updated dependencies [eb5aca7]
+  - @framekore/core@1.0.0
+  - @framekore/transform2d@2.0.0
+
 ## 1.0.0
 
 ### Minor Changes
