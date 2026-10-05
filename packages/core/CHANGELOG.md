@@ -1,5 +1,11 @@
 # @framekore/core
 
+## 2.0.0
+
+### Major Changes
+
+- 15f71e8: noComponents
+
 ## 1.0.0
 
 ### Major Changes
