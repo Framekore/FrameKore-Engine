@@ -24,6 +24,11 @@ export const render2d = definePlugin((canvas: HTMLCanvasElement) => {
             const manager = RenderManager2D.getFromScene(scene);
             manager.render(scene, delta);
         },
+        update(engine, delta) {
+            if (!engine.currentScene) return
+            const manager = RenderManager2D.get(engine);
+            manager.updateCamera(engine.currentScene, delta);
+        },
         destroy() {
             renderDisposer?.dispose()
         }
@@ -113,7 +118,13 @@ export class RenderManager2D {
         this.ctx.translate(-transform.position.x, -transform.position.y)
     }
 
-    #updateCamera(camera: Camera2D, transform: TransformLike, delta: number) {
+    updateCamera(scene: Scene, delta: number): void {
+        const cam = this.#getMainCamera(scene)
+        if (!cam) return
+        this.#updateCameraInternal(cam.camera, cam.transform, delta)
+    }
+
+    #updateCameraInternal(camera: Camera2D, transform: TransformLike, delta: number) {
         if (!camera.target)
             return
         const targetTransform = getComponentByType(camera.target, Transform2D)
@@ -258,7 +269,6 @@ export class RenderManager2D {
         this.ctx.save()
 
         if (cam) {
-            this.#updateCamera(cam.camera, cam.transform, delta)
             this.#applyCamera(cam.camera, cam.transform)
         }
 
