@@ -3,7 +3,22 @@ import type { Frame } from "./texture";
 
 /**
  * Component for rendering animated sprites from a spritesheet.
- * Extends Sprite2D to manage time-based frame swapping.
+ *
+ * Extends {@link Sprite2D} with a time-based frame sequencer. Add individual
+ * frames with {@link addFrame}, then call {@link play} to start playback.
+ * The animation advances automatically when {@link update} is called each
+ * game-loop tick (typically driven by {@link Animator2D}).
+ *
+ * @example
+ * const anim = new AnimatedSprite2D(engine, texture);
+ * anim.fps = 12;
+ * anim.addFrame(0, 0);
+ * anim.addFrame(1, 0);
+ * anim.addFrame(2, 0);
+ * anim.play();
+ *
+ * // In the update loop:
+ * anim.update(delta);
  */
 export class AnimatedSprite2D extends Sprite2D {
     /** @internal List of frames making up the current animation sequence. */
@@ -28,7 +43,10 @@ export class AnimatedSprite2D extends Sprite2D {
      */
     #playing = false;
 
-    /** Determines whether the animation loops when reaching the last frame. */
+    /** Determines whether the animation loops back to frame 0 after reaching the last frame.
+     * When `false`, playback stops on the last frame.
+     * @default true
+     */
     loop = true
 
     /**
@@ -51,6 +69,13 @@ export class AnimatedSprite2D extends Sprite2D {
         }
     }
 
+    /**
+     * Resets the animation back to the first frame and clears the elapsed timer.
+     * Does not change the playing state — call {@link play} afterwards if needed.
+     * @example
+     * anim.reset();
+     * anim.play();
+     */
     reset(): void {
         this.#currentFrame = 0;
         this.#elapsed = 0;

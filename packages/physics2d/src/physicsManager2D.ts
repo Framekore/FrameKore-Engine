@@ -10,11 +10,26 @@ import { RigidBody2D } from "./RigidBody2D";
 // Agora vamos varrer a cena dinamicamente (como o RenderManager2D faz).
 
 /**
- * Creates the Physics2D plugin for the Engine.
- * Registers PhysicsManager2D and handles fixed step updates for physics resolution.
- * @returns An EnginePlugin definition to be passed to `engine.use()`.
+ * Creates and registers the `physics2d` plugin with the engine.
+ *
+ * This plugin:
+ * - Instantiates a {@link Physics2D} manager and stores it as an engine resource.
+ * - Hooks into the engine's fixed-update loop to call {@link Physics2D.step} each tick,
+ *   advancing the physics simulation by the fixed time step `delta`.
+ *
+ * Register once when setting up the engine. After registration you can retrieve the
+ * manager at any time via `engine.getResource(Physics2D)`.
+ *
+ * @returns An `EnginePlugin` definition ready to be passed to `engine.use()`.
+ *
  * @example
+ * import { physics2d } from "@framekore/physics2d";
+ *
  * engine.use(physics2d());
+ *
+ * // Later, access the physics manager from anywhere:
+ * const physics = engine.getResource(Physics2D);
+ * physics.gravity.y = 980; // Adjust gravity
  */
 export const physics2d = definePlugin(() => {
   return {
@@ -36,34 +51,85 @@ export const physics2d = definePlugin(() => {
 });
 
 /**
- * Manages physics simulation, collision detection, and resolution.
- * Accessed globally through the Engine resources.
+ * Central physics manager for the `@framekore/physics2d` package.
+ *
+ * `Physics2D` drives the 2D physics simulation each fixed-update step. It:
+ * 1. Scans the active {@link Scene} for all {@link RigidBody2D} and {@link BoxCollide2D}
+ *    components.
+ * 2. Applies gravity to bodies that have `useGravity` enabled.
+ * 3. Moves each body along the X axis, then resolves collisions horizontally.
+ * 4. Moves each body along the Y axis, then resolves collisions vertically.
+ *
+ * This separated-axis approach prevents tunnelling and gives predictable results for
+ * platformer-style games.
+ *
+ * Retrieve the singleton instance from anywhere using:
+ * ```ts
+ * const physics = engine.getResource(Physics2D);
+ * ```
+ *
+ * @example
+ * // Change global gravity at runtime
+ * const physics = engine.getResource(Physics2D);
+ * physics.gravity.y = 2000; // stronger gravity
+ *
+ * @example
+ * // Manual collision check between two objects
+ * const physics = engine.getResource(Physics2D);
+ * if (physics.checkCollision(player, enemy)) {
+ *   takeDamage();
+ * }
  */
 export class Physics2D {
-  /** 
-   * Global gravity vector applied to all RigidBody2D components that have `useGravity` enabled.
+  /**
+   * Global gravity vector applied every fixed step to each {@link RigidBody2D} that
+   * has `useGravity` set to `true`.
+   *
+   * The default value of `(0, 1500)` produces a fast arcade-style downward pull.
+   * Reduce `y` for a slower, heavier feel; set it to `0` for zero-gravity environments.
+   * Modify `x` for side-scrollers with unusual gravity directions.
+   *
+   * Units: pixels per second² (applied as `velocity.y += gravity.y * delta`).
+   *
+   * @default new Vector2(0, 1500)
+   *
+   * @example
+   * const physics = engine.getResource(Physics2D);
+   * physics.gravity.y = 980;  // Earth-like (scaled to your pixel units)
+   * physics.gravity.y = 0;    // Zero gravity / top-down game
    */
   gravity: Vector2 = new Vector2(0, 1500);
 
+  /** @internal Engine reference used to access the active scene each step. */
   #engine: Engine;
 
   /**
-   * @internal Instantiated automatically by the physics2d plugin.
+   * Creates a new `Physics2D` manager bound to the given engine instance.
+   * @internal Instantiated automatically by the {@link physics2d} plugin — do not call directly.
+   * @param engine - The engine instance this manager belongs to.
    */
   constructor(engine: Engine) {
     this.#engine = engine;
   }
 
   /**
-   * Checks if two GameObjects are physically overlapping (AABB collision).
-   * Both objects must have a Transform2D and BoxCollide2D component.
-   * @param a - The first GameObject.
-   * @param b - The second GameObject.
-   * @returns True if the colliders overlap, otherwise false.
+   * Tests whether two GameObjects' AABB colliders are currently overlapping.
+   *
+   * Both objects **must** have a {@link Transform2D} and a {@link BoxCollide2D} component;
+   * otherwise an error is thrown. The check does **not** consider layer/mask filters —
+   * use {@link canCollide} beforehand if you need layer-aware filtering.
+   *
+   * @param a - The first {@link GameObject} to test.
+   * @param b - The second {@link GameObject} to test.
+   * @returns `true` if the two AABB bounds overlap, `false` otherwise.
+   * @throws {Error} If either object is missing a `Transform2D` or `BoxCollide2D` component.
+   *
    * @example
    * const physics = engine.getResource(Physics2D);
+   *
    * if (physics.checkCollision(player, bullet)) {
-   *   console.log("Player hit!");
+   *   console.log("Player hit by bullet!");
+   *   bullet.destroy();
    * }
    */
   checkCollision(a: GameObject, b: GameObject): boolean {
@@ -90,10 +156,28 @@ export class Physics2D {
   }
 
   /**
-   * Determines whether two colliders are allowed to interact based on their layer and mask configuration.
-   * @param boxA - The first BoxCollide2D.
-   * @param boxB - The second BoxCollide2D.
-   * @returns True if they can collide, false otherwise.
+   * Checks whether two {@link BoxCollide2D} colliders are permitted to interact based on
+   * their `layer` and `mask` bitmask configuration.
+   *
+   * A pair can collide only when **both** conditions are true:
+   * - `boxA.mask` includes `boxB.layer` (`boxA.mask & boxB.layer !== 0`)
+   * - `boxB.mask` includes `boxA.layer` (`boxB.mask & boxA.layer !== 0`)
+   *
+   * This is used internally by {@link resolveCollisionsX} and {@link resolveCollisionsY}
+   * to skip pairs that should not interact, reducing unnecessary computation.
+   *
+   * @param boxA - The first {@link BoxCollide2D}.
+   * @param boxB - The second {@link BoxCollide2D}.
+   * @returns `true` if the pair is allowed to collide, `false` otherwise.
+   *
+   * @example
+   * const physics = engine.getResource(Physics2D);
+   * const playerBox = getComponentByType(player, BoxCollide2D);
+   * const wallBox   = getComponentByType(wall, BoxCollide2D);
+   *
+   * if (physics.canCollide(playerBox, wallBox)) {
+   *   console.log("Player and wall can interact");
+   * }
    */
   canCollide(boxA: BoxCollide2D, boxB: BoxCollide2D): boolean {
     const aHitsB = (boxA.mask & boxB.layer) !== 0
@@ -103,10 +187,28 @@ export class Physics2D {
   }
 
   /**
-   * Manually resolves a collision between two GameObjects by separating them.
-   * Updates velocities and touching state if RigidBody2D components are present.
-   * @param object1 - The first GameObject.
-   * @param object2 - The second GameObject.
+   * Manually resolves a collision between two GameObjects by calculating the minimum
+   * overlap on each axis (AABB MTV — Minimum Translation Vector) and separating them.
+   *
+   * - If both objects have a {@link RigidBody2D}, the correction is split equally between them.
+   * - If only one object has a {@link RigidBody2D}, the full correction is applied to that object.
+   * - The velocity component along the collision axis is zeroed out.
+   * - The relevant `touching` flag is set on each `RigidBody2D` involved.
+   *
+   * Both objects **must** have `Transform2D` and `BoxCollide2D` components, otherwise
+   * an error is thrown.
+   *
+   * > **Note:** Prefer letting {@link step} handle resolution automatically. Call this
+   * > method directly only for one-off, manual resolution outside the physics loop.
+   *
+   * @param object1 - The first {@link GameObject}.
+   * @param object2 - The second {@link GameObject}.
+   * @throws {Error} If either object is missing a `Transform2D` or `BoxCollide2D` component.
+   *
+   * @example
+   * const physics = engine.getResource(Physics2D);
+   * // Manually push two objects apart after a custom overlap test
+   * physics.resolveCollision(playerObj, wallObj);
    */
   resolveCollision(object1: GameObject, object2: GameObject): void {
     
@@ -227,9 +329,28 @@ export class Physics2D {
   }
 
   /**
-   * Updates physics states, applies gravity, moves objects, and resolves collisions using a separated-axis approach.
-   * Called automatically by the engine's fixed update loop.
-   * @param delta - The fixed time step.
+   * Advances the physics simulation by one fixed time step.
+   *
+   * Execution order each call:
+   * 1. Collect all {@link RigidBody2D} and {@link BoxCollide2D} components from the active scene.
+   * 2. Reset every collider's `colliding` flag to `false`.
+   * 3. Reset every rigid body's `touching` state (top/bottom/left/right) to `false`.
+   * 4. For each rigid body:
+   *    a. Apply `gravity.y` to `velocity.y` (if `useGravity` is enabled).
+   *    b. Move the object along the X axis (`position.x += velocity.x * delta`).
+   *    c. Resolve X-axis collisions via {@link resolveCollisionsX}.
+   *    d. Move the object along the Y axis (`position.y += velocity.y * delta`).
+   *    e. Resolve Y-axis collisions via {@link resolveCollisionsY}.
+   *
+   * Called automatically by the `physics2d` plugin on every `fixedUpdate` tick.
+   * Do not call this manually unless you are managing the physics loop yourself.
+   *
+   * @param delta - The fixed time step in seconds (e.g., `1/60` for a 60 Hz physics rate).
+   *
+   * @example
+   * // The plugin calls this for you — manual usage is rare:
+   * const physics = engine.getResource(Physics2D);
+   * physics.step(1 / 60);
    */
   step(delta: number): void {
     const scene = this.#engine.currentScene;
@@ -274,9 +395,18 @@ export class Physics2D {
   }
 
   /**
-   * Resolves horizontal (X-axis) collisions for a specific rigid body against all other colliders.
-   * @param rb - The moving RigidBody2D.
-   * @param colSet - Set of all active BoxCollide2D components.
+   * Resolves horizontal (X-axis) overlaps between a specific {@link RigidBody2D} and all
+   * active colliders in the scene after the body has been moved along the X axis.
+   *
+   * For each other collider that passes the layer/mask and AABB overlap tests:
+   * - If either collider is a **trigger**, only the `colliding` flag is set — no position correction.
+   * - Otherwise, the body is pushed back to remove the overlap, velocity X is zeroed, and the
+   *   appropriate `touching` flag (`left` or `right`) is set based on the direction of movement.
+   *
+   * Called internally by {@link step}. Should not need to be called directly.
+   *
+   * @param rb     - The {@link RigidBody2D} whose X movement is being resolved.
+   * @param colSet - The set of all active {@link BoxCollide2D} components in the scene.
    */
   resolveCollisionsX(rb: RigidBody2D, colSet: Set<BoxCollide2D>): void {
     const objA = rb.gameObject
@@ -323,9 +453,21 @@ export class Physics2D {
   }
 
   /**
-   * Resolves vertical (Y-axis) collisions for a specific rigid body against all other colliders.
-   * @param rb - The moving RigidBody2D.
-   * @param colSet - Set of all active BoxCollide2D components.
+   * Resolves vertical (Y-axis) overlaps between a specific {@link RigidBody2D} and all
+   * active colliders in the scene after the body has been moved along the Y axis.
+   *
+   * For each other collider that passes the layer/mask and AABB overlap tests:
+   * - If either collider is a **trigger**, the overlap is skipped (trigger flags are already
+   *   handled during the X pass in {@link resolveCollisionsX}).
+   * - Otherwise, the body is pushed back to remove the overlap, velocity Y is zeroed, and the
+   *   appropriate `touching` flag (`top` or `bottom`) is set based on the direction of movement.
+   *
+   * Setting `touching.bottom = true` indicates the body is **grounded** this frame.
+   *
+   * Called internally by {@link step}. Should not need to be called directly.
+   *
+   * @param rb     - The {@link RigidBody2D} whose Y movement is being resolved.
+   * @param colSet - The set of all active {@link BoxCollide2D} components in the scene.
    */
   resolveCollisionsY(rb: RigidBody2D, colSet: Set<BoxCollide2D>): void {
     const objA = rb.gameObject
@@ -364,3 +506,4 @@ export class Physics2D {
     }
   }
 }
+

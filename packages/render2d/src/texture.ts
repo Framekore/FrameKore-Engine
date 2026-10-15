@@ -1,20 +1,43 @@
 /**
- * Represents a rectangular region within a Texture, typically used for spritesheets.
+ * Represents a rectangular region within a {@link Texture}, used to address
+ * individual frames of a spritesheet.
+ *
+ * All values are in pixels, measured from the top-left corner of the
+ * source image.
+ *
+ * @example
+ * // A frame at column 2, row 0 of a 32×32 grid
+ * const frame: Frame = { x: 64, y: 0, width: 32, height: 32 };
  */
-export type Frame = { 
-    /** X coordinate in pixels from the top-left of the image. */
-    x: number, 
-    /** Y coordinate in pixels from the top-left of the image. */
-    y: number, 
+export type Frame = {
+    /** X coordinate in pixels from the top-left of the source image. */
+    x: number,
+    /** Y coordinate in pixels from the top-left of the source image. */
+    y: number,
     /** Width of the frame in pixels. */
-    width: number, 
+    width: number,
     /** Height of the frame in pixels. */
     height: number
 }
 
 /**
- * Wrapper class around an HTML image or canvas element.
- * It provides utilities to slice a spritesheet into frames.
+ * Wrapper around an `HTMLImageElement` or `HTMLCanvasElement` that provides
+ * utilities for working with spritesheets.
+ *
+ * A `Texture` can be sliced into a uniform grid of {@link Frame} objects via
+ * {@link slice}, and individual frames can be retrieved by grid coordinate
+ * ({@link getFrame}) or by a custom string alias ({@link define} /
+ * {@link getFrameByName}).
+ *
+ * @example
+ * // Load an image, wrap it in a Texture, and slice it into 32×32 tiles
+ * const img = await assets.load("player", Image, "/sprites/player.png");
+ * const texture = new Texture(img);
+ * texture.slice(32, 32);
+ *
+ * // Optionally give meaningful names to specific frames
+ * texture.define("idle", 0, 0);
+ * texture.define("run_1", 1, 0);
  */
 export class Texture {
     /** 
@@ -60,10 +83,16 @@ export class Texture {
         }
     }
 
+    /**
+     * The total width of the underlying image source, in pixels.
+     */
     get width(): number {
         return this.image.width
     }
 
+    /**
+     * The total height of the underlying image source, in pixels.
+     */
     get height(): number {
         return this.image.height
     }
@@ -98,11 +127,13 @@ export class Texture {
     
     /**
      * Retrieves a frame by its defined alias name.
-     * The frame must have been aliased using `define()` beforehand.
-     * @param name - The custom alnão consegue deletar a propria ias name.
-     * @returns The Frame object, or undefined if not found.
+     * The frame must have been previously aliased using {@link define}.
+     * @param name - The custom alias name assigned via `define()`.
+     * @returns The {@link Frame} object, or `undefined` if the alias was not found.
      * @example
-     * const runFrame = texture.getFrameByName("player_run_1");
+     * texture.define("run_1", 1, 0);
+     * const frame = texture.getFrameByName("run_1");
+     * if (frame) sprite.frame = frame;
      */
     getFrameByName(name: string): Frame | undefined {
         return this.#namedFrames.get(name)
