@@ -5,7 +5,6 @@ import { Camera2D } from "./camera2d";
 import { Sprite2D } from "./sprite2D";
 import { Texture } from "./texture";
 import { Renderable2D } from "./renderable2D";
-// import { hasCamera2D, hasSprite2D } from ".";
 
 type TransformLike = ITransform2D
 
@@ -35,9 +34,21 @@ export const render2d = definePlugin((canvas: HTMLCanvasElement) => {
     }
 })
 
+/** A draw call queued manually via draw() or drawScreen(). */
+type DrawEntry = {
+    depth: number
+    screen: boolean
+    fn: (ctx: CanvasRenderingContext2D) => void
+}
+
 /**
  * Manages all 2D rendering operations on the canvas.
  * Handles the drawing queue, camera transformations, and rendering of Sprite2D components.
+ * 
+ * All renderables and manual draw calls are sorted by **depth** before being drawn each frame:
+ * - **Lower depth = drawn first (behind everything)** — use negative values for backgrounds.
+ * - **Higher depth = drawn last (in front of everything)** — use positive values for foreground/UI.
+ * 
  * This class is automatically instantiated and registered as a resource by the `render2d` plugin.
  */
 export class RenderManager2D {
@@ -45,8 +56,7 @@ export class RenderManager2D {
     canvas: HTMLCanvasElement
     /** The 2D rendering context of the canvas. */
     ctx: CanvasRenderingContext2D
-    #drawQueue: Array<(ctx: CanvasRenderingContext2D) => void> = []
-    #screenDrawQueue: Array<(ctx: CanvasRenderingContext2D) => void> = []
+    #drawQueue: DrawEntry[] = []
     #antialiasing: boolean = false
 
     /**
@@ -71,6 +81,7 @@ export class RenderManager2D {
     get antialiasing(): boolean {
         return this.#antialiasing;
     }
+
     static get(engine: Engine): RenderManager2D {
         const render = engine.getResource(RenderManager2D)
         if (!render)
@@ -98,7 +109,6 @@ export class RenderManager2D {
         transform: TransformLike
     } | null {
         for (const obj of scene.getObjects()) {
-            // const camera = hasCamera2D(obj) ? obj.camera : null
             const camera = obj instanceof Camera2D ? obj : null
             if (!camera || !camera.isMain) continue
 
@@ -214,74 +224,88 @@ export class RenderManager2D {
         return new Texture(image)
     }
 
-    draw(callback: (ctx: CanvasRenderingContext2D) => void): void {
-        this.#drawQueue.push(callback)
+    /**
+     * Queues a manual draw call to be executed in world space (affected by camera), sorted by depth.
+     * - **Negative depth** = behind sprites (backgrounds, tiles, floors).
+     * - **Positive depth** = in front of sprites (shadows, effects, debug).
+     * - **Default is `0`** (same layer as sprites with zIndex 0).
+     * @param callback - Function receiving the CanvasRenderingContext2D.
+     * @param depth - Drawing order. Lower = drawn first (behind). Default: `0`.
+     * @example
+     * // Background (drawn behind everything)
+     * render.draw((ctx) => ctx.fillRect(0, 0, 800, 800), -100);
+     *
+     * // Foreground effect (drawn in front of sprites)
+     * render.draw((ctx) => { ... }, 10);
+     */
+    draw(callback: (ctx: CanvasRenderingContext2D) => void, depth: number = 0): void {
+        this.#drawQueue.push({ depth, screen: false, fn: callback })
     }
 
-    drawScreen(callback: (ctx: CanvasRenderingContext2D) => void): void {
-        this.#screenDrawQueue.push(callback)
-    }
-
-    #flushDrawQueue() {
-        for (const draw of this.#drawQueue) {
-            draw(this.ctx)
-        }
-        this.#drawQueue.length = 0
-    }
-
-    #flushScreenDrawQueue() {
-        for (const draw of this.#screenDrawQueue) {
-            draw(this.ctx)
-        }
-        this.#screenDrawQueue.length = 0
-    }
-
-    // #renderSprite(transform: ITransform2D, sprite: Sprite2D) {
-    //     const f = sprite.frame!;
-
-    //     this.ctx.save();
-
-    //     sprite.render(this.ctx)
-
-    //     this.ctx.restore();
-    // }
-
-    #renderObjects(obj: GameObject) {
-        // OLD: depended on hasSprite2D to detect renderables
-        // const transform = hasTransform2D(obj) ? obj.transform2d : null
-        // const sprite = hasSprite2D(obj) ? obj.sprite : null
-        // if (!transform || !sprite || !sprite.frame) return
-        // this.#renderSprite(transform, sprite)
-
-        // NEW: qualquer Renderable2D na cena é renderizado automaticamente
-        if (obj instanceof Renderable2D) {
-            obj.render(this.ctx)
-        }
+    /**
+     * Queues a manual draw call in screen space (ignores camera and zoom), sorted by depth.
+     * Use this for HUD, UI, debug text, etc.
+     * - **Lower depth** = drawn behind other screen elements.
+     * - **Higher depth** = drawn in front.
+     * @param callback - Function receiving the CanvasRenderingContext2D.
+     * @param depth - Drawing order within screen space. Default: `0`.
+     * @example
+     * render.drawScreen((ctx) => {
+     *   ctx.fillText("Score: 100", 10, 20);
+     * }, 10);
+     */
+    drawScreen(callback: (ctx: CanvasRenderingContext2D) => void, depth: number = 0): void {
+        this.#drawQueue.push({ depth, screen: true, fn: callback })
     }
 
     render(scene?: Scene, delta: number = 1 / 60): void {
-
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
         if (!scene) return
 
         const cam = this.#getMainCamera(scene)
 
-        this.ctx.save()
+        // Collect all Renderable2D objects from the scene
+        const renderables: { depth: number, screen: false, fn: (ctx: CanvasRenderingContext2D) => void }[] = []
+        for (const obj of scene.getObjects()) {
+            if (obj instanceof Renderable2D && obj.visible) {
+                const depth = obj.zIndex
+                renderables.push({ depth, screen: false, fn: (ctx) => obj.render(ctx) })
+            }
+        }
 
+        // Merge manual draw calls with renderables and sort all by depth
+        const worldEntries: DrawEntry[] = []
+        const screenEntries: DrawEntry[] = []
+
+        for (const entry of renderables) {
+            worldEntries.push(entry)
+        }
+        for (const entry of this.#drawQueue) {
+            if (entry.screen) {
+                screenEntries.push(entry)
+            } else {
+                worldEntries.push(entry)
+            }
+        }
+        this.#drawQueue.length = 0
+
+        // Sort: lower depth first (drawn behind), higher depth last (drawn in front)
+        worldEntries.sort((a, b) => a.depth - b.depth)
+        screenEntries.sort((a, b) => a.depth - b.depth)
+
+        // Draw world (camera-affected) entries
+        this.ctx.save()
         if (cam) {
             this.#applyCamera(cam.camera, cam.transform)
         }
-
-        const objects = scene.getObjects()
-
-        for (const obj of objects) {
-            this.#renderObjects(obj)
+        for (const entry of worldEntries) {
+            entry.fn(this.ctx)
         }
-
-        this.#flushDrawQueue()
-
         this.ctx.restore()
 
-        this.#flushScreenDrawQueue()
+        // Draw screen (UI) entries — outside camera transform
+        for (const entry of screenEntries) {
+            entry.fn(this.ctx)
+        }
     }
 }
