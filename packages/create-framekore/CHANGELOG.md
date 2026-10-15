@@ -1,5 +1,11 @@
 # create-framekore
 
+## 0.1.4
+
+### Patch Changes
+
+- 9651a17: documentation
+
 ## 0.1.3
 
 ### Patch Changes

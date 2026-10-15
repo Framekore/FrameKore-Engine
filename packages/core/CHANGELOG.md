@@ -1,5 +1,11 @@
 # @framekore/core
 
+## 2.0.1
+
+### Patch Changes
+
+- 9651a17: documentation
+
 ## 2.0.0
 
 ### Major Changes
